@@ -7,7 +7,7 @@ allowed-tools: Bash, Read, Write
 
 # Antigravity Docs Index Builder
 
-Regenerates `.claude/skills/antigravity-docs/references/docs-manifest.json` — the static index that the **`antigravity-docs`** skill reads to answer questions. This is a maintenance skill you run by hand whenever the Antigravity docs may have changed; `antigravity-docs` itself never runs it.
+Regenerates `.claude/skills/coding-agent-docs/skills/antigravity-docs/references/docs-manifest.json` — the static index that the **`antigravity-docs`** skill (published as part of the `coding-agent-docs` plugin) reads to answer questions. This is a maintenance skill you run by hand whenever the Antigravity docs may have changed; `antigravity-docs` itself never runs it.
 
 ## Why this skill has to exist
 

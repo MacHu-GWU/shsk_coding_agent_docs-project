@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Build .claude/skills/antigravity-docs/references/docs-manifest.json from the
-live Antigravity web app.
+Build .claude/skills/coding-agent-docs/skills/antigravity-docs/references/docs-manifest.json
+from the live Antigravity web app.
 
 Why this exists: antigravity.google/docs pages are a client-rendered SPA with no
 static per-page content that a plain HTTP fetch can read. But the app ships two
@@ -40,7 +40,8 @@ LLMS_URL = f"{BASE}/llms.txt"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MANIFEST_PATH = os.path.normpath(os.path.join(
-    SCRIPT_DIR, "..", "..", "antigravity-docs", "references", "docs-manifest.json"))
+    SCRIPT_DIR, "..", "..", "coding-agent-docs", "skills", "antigravity-docs",
+    "references", "docs-manifest.json"))
 
 GENERATED_AT = os.environ.get("ANTIGRAVITY_BUILD_DATE", "").strip()
 
