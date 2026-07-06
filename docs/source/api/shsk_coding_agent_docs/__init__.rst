@@ -1,5 +1,5 @@
 shsk_coding_agent_docs
-==================================
+======================
 
 .. automodule:: shsk_coding_agent_docs
     :members:
