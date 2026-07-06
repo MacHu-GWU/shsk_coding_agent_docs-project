@@ -4,9 +4,9 @@ This document guides AI assistants on how to navigate and work with this project
 
 ## Project Overview
 
-**What this project does:** Read `README.rst` for project description and purpose.
+**What this project does:** Distills the official documentation of AI coding agents into reusable Agent Skills, so an agent can discover, organize, and learn from another tool's current docs on demand — instead of relying on stale training data or assumptions. Targets three agents today: Anthropic's Claude Code, OpenAI's Codex, and Google's Antigravity. Everything meant for external use ships as a single Claude Code plugin, `coding-agent-docs`, under `.claude/skills/coding-agent-docs/`. See `README.rst` and `docs/source/99-Maintainer-Guide/` for details.
 
-**Project type:** Python package
+**Project type:** Python package housing a Claude Code plugin
 
 ## Core Configuration Files
 
