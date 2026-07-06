@@ -1,0 +1,476 @@
+{
+  "_meta": {
+    "generated_at": "2026-07-03",
+    "source_bundle": "main-C7HXKFZQ.js",
+    "bundle_sha256": "425f11490caf871da86329a5efec42da6199dd5e1b76ab1774d222c2a7e549e0",
+    "index_url": "https://antigravity.google/llms.txt",
+    "content_url_template": "https://antigravity.google/assets/docs/{path}/{filename}.md",
+    "page_count": 66,
+    "builder_skill": "antigravity-docs-index-builder",
+    "note": "Auto-generated from the Antigravity web app JS bundle DOCS_STRUCTURE, enriched with titles/descriptions from llms.txt. Do not hand-edit; regenerate with /antigravity-docs-index-builder."
+  },
+  "pages": [
+    {
+      "section": "Home",
+      "slug": "home",
+      "title": "Documentation Home",
+      "description": "Getting started guide for the platform.",
+      "content_url": "https://antigravity.google/assets/docs/home/home.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "overview",
+      "title": "Overview",
+      "description": "Overview of the 2.0 interface.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/overview.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "getting-started",
+      "title": "Getting Started",
+      "description": "Quickstart guide.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/getting-started.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "build-with-google",
+      "title": "Build with Google",
+      "description": "How to connect with Gemini and build solutions.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/build-with-google.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "features",
+      "title": "Features",
+      "description": "Major components and features of the UI.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/features.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "models",
+      "title": "Models",
+      "description": "Supported LLM classes (Pro, Flash, etc.).",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/models.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "projects",
+      "title": "Projects",
+      "description": "Configuring workspaces, directory bounds, and paths.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/projects.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "settings",
+      "title": "Settings",
+      "description": "User configuration options.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/settings.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "agent-settings",
+      "title": "Agent Settings",
+      "description": "System prompt, tool rules, and runtime adjustments.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/agent-settings.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "artifact-review",
+      "title": "Artifact Review",
+      "description": "Interface for approving agent plans and tasks.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/artifact-review.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "mcp",
+      "title": "Model Context Protocol (MCP)",
+      "description": "Extending agent tools using standard MCP servers.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/mcp.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "skills",
+      "title": "Skills",
+      "description": "Specifying packaged skill scripts and instructions.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/skills.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "rules-workflows",
+      "title": "Rules & Workflows",
+      "description": "Designing workflow boundaries and system instructions.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/rules-workflows.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "plugins",
+      "title": "Plugins",
+      "description": "Extending GUI features via plugins.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/plugins.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "hooks",
+      "title": "Hooks",
+      "description": "Custom lifecycle trigger hooks.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/hooks.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "sidecars",
+      "title": "Sidecars",
+      "description": "Long-running background scripts.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/sidecars.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "permissions",
+      "title": "Permissions",
+      "description": "Sandbox controls and folder permissions.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/permissions.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "subagents",
+      "title": "Subagents",
+      "description": "Orchestrating multiple subagents in parallel.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/subagents.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "artifacts",
+      "title": "Artifacts",
+      "description": "Managing structured deliverables.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/artifacts.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "implementation-plan",
+      "title": "Implementation Plan",
+      "description": "Structure of files created for proposing code updates.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/implementation-plan.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "walkthrough",
+      "title": "Walkthrough",
+      "description": "Structural representation of walkthrough reviews.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/walkthrough.md"
+    },
+    {
+      "section": "Antigravity 2.0",
+      "slug": "screenshots",
+      "title": "Screenshots",
+      "description": "How visual artifacts capture layout updates.",
+      "content_url": "https://antigravity.google/assets/docs/antigravity-2-0/screenshots.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/overview",
+      "title": "CLI Overview",
+      "description": "CLI architecture and usage patterns.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-overview.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/getting-started",
+      "title": "CLI Getting Started",
+      "description": "Quick launch instructions.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-getting-started.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/install",
+      "title": "CLI Installation",
+      "description": "Setting up dependencies and command line tools.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-install.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/tutorial",
+      "title": "CLI Tutorial",
+      "description": "Stepping through a real-world debugging task.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-tutorial.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/using",
+      "title": "CLI Usage",
+      "description": "Primary prompt flow and keyboard commands.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-using.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/features",
+      "title": "CLI Features",
+      "description": "Shell-specific features and utilities.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-features.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/gcli-migration",
+      "title": "Migration from gcli",
+      "description": "Upgrading legacy CLI tools.",
+      "content_url": "https://antigravity.google/assets/docs/cli/gcli-migration.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/prompting",
+      "title": "Prompting Best Practices",
+      "description": "Writing clear instructions for CLI agents.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-prompting.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/artifacts",
+      "title": "CLI Artifacts",
+      "description": "Reviewing deliverables in the terminal.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-artifacts.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/conversations",
+      "title": "CLI Conversations",
+      "description": "Managing back-and-forth prompt history.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-conversations.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/subagents",
+      "title": "CLI Subagents",
+      "description": "Delegating CLI tasks to sub-sessions.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-subagents.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/permissions",
+      "title": "CLI Permissions",
+      "description": "Shell-specific capability boundaries.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-permissions.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/sandbox",
+      "title": "CLI Sandbox",
+      "description": "Running tools inside isolated sandboxes.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-sandbox.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/settings",
+      "title": "CLI Settings",
+      "description": "Storing prompt defaults and global parameters.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-settings.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/credits",
+      "title": "CLI Credits",
+      "description": "Tracking billing and token quotas.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-credits.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/plugins",
+      "title": "CLI Plugins",
+      "description": "Registering shell extensions.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-plugins.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/statusline",
+      "title": "CLI Status Line",
+      "description": "Interpreting shell prompts and state badges.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-statusline.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/title",
+      "title": "CLI Title Bar",
+      "description": "Shell configuration indicators.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-title.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/best-practices",
+      "title": "CLI Best Practices",
+      "description": "Optimizing shell prompt sequences.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-best-practices.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/troubleshooting",
+      "title": "CLI Troubleshooting",
+      "description": "Recovering from common sandbox errors.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-troubleshooting.md"
+    },
+    {
+      "section": "Antigravity CLI",
+      "slug": "cli/reference",
+      "title": "CLI Reference",
+      "description": "Complete reference card of commands and shortcuts.",
+      "content_url": "https://antigravity.google/assets/docs/cli/cli-reference.md"
+    },
+    {
+      "section": "Antigravity SDK",
+      "slug": "sdk/overview",
+      "title": "SDK Overview",
+      "description": "Python API reference and runtime binary installation.",
+      "content_url": "https://antigravity.google/assets/docs/sdk/sdk-overview.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/overview",
+      "title": "IDE Overview",
+      "description": "Editor integrations and features.",
+      "content_url": "https://antigravity.google/assets/docs/ide/ide-overview.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/getting-started",
+      "title": "IDE Getting Started",
+      "description": "Setup and config inside the editor.",
+      "content_url": "https://antigravity.google/assets/docs/ide/ide-getting-started.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/tab",
+      "title": "Tab Completion",
+      "description": "Real-time code completion models.",
+      "content_url": "https://antigravity.google/assets/docs/editor/tab.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/agent-side-panel",
+      "title": "Agent Side Panel",
+      "description": "Interacting with agents alongside the text buffer.",
+      "content_url": "https://antigravity.google/assets/docs/editor/agent-side-panel.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/review-changes-editor",
+      "title": "Reviewing Changes",
+      "description": "In-line code diff review and modification.",
+      "content_url": "https://antigravity.google/assets/docs/editor/review-changes-editor.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/implementation-plan",
+      "title": "IDE Implementation Plan",
+      "description": "File-level planning and code generation.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-implementation-plan.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/walkthrough",
+      "title": "IDE Walkthrough",
+      "description": "Interactive codebase tour artifacts.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-walkthrough.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/screenshots",
+      "title": "IDE Screenshots",
+      "description": "Triggering screenshot generation inside the editor.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-screenshots.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/browser-recordings",
+      "title": "IDE Browser Recordings",
+      "description": "Video artifact tracking.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-browser-recordings.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/browser",
+      "title": "Browser Integration",
+      "description": "Chrome driver setup for interactive web testing.",
+      "content_url": "https://antigravity.google/assets/docs/browser/browser.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/allowlist-denylist",
+      "title": "Allowlist & Denylist",
+      "description": "Domain access rules for agents.",
+      "content_url": "https://antigravity.google/assets/docs/browser/allowlist-denylist.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/separate-chrome-profile",
+      "title": "Chrome Profiles",
+      "description": "Isolating development data.",
+      "content_url": "https://antigravity.google/assets/docs/browser/separate-chrome-profile.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/skills",
+      "title": "IDE Skills",
+      "description": "Loading custom scripts for inline code modification.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-skills.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/rules",
+      "title": "IDE Rules",
+      "description": "Contextual behavior guidelines.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-rules.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/workflows",
+      "title": "IDE Workflows",
+      "description": "Pre-configured multi-step plans.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-workflows.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/plugins",
+      "title": "IDE Plugins",
+      "description": "Extensibility mechanisms.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-plugins.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/hooks",
+      "title": "IDE Hooks",
+      "description": "Triggering agent execution on text events.",
+      "content_url": "https://antigravity.google/assets/docs/editor/ide-hooks.md"
+    },
+    {
+      "section": "Antigravity IDE",
+      "slug": "ide/settings",
+      "title": "IDE Settings",
+      "description": "Editor UI preferences.",
+      "content_url": "https://antigravity.google/assets/docs/settings/ide-settings.md"
+    },
+    {
+      "section": "Migration",
+      "slug": "firebase-studio-migration",
+      "title": "Firebase Studio Migration",
+      "description": "Transitioning project settings from Firebase Studio.",
+      "content_url": "https://antigravity.google/assets/docs/migration/firebase-studio-migration.md"
+    },
+    {
+      "section": "Enterprise",
+      "slug": "enterprise",
+      "title": "Enterprise Features",
+      "description": "Organization level deployments.",
+      "content_url": "https://antigravity.google/assets/docs/enterprise/enterprise.md"
+    },
+    {
+      "section": "Plans",
+      "slug": "plans",
+      "title": "Plans & Pricing",
+      "description": "Choosing the right subscription plan.",
+      "content_url": "https://antigravity.google/assets/docs/plans/plans.md"
+    },
+    {
+      "section": "FAQ",
+      "slug": "faq",
+      "title": "Frequently Asked Questions",
+      "description": "General help and troubleshooting.",
+      "content_url": "https://antigravity.google/assets/docs/faq/faq.md"
+    }
+  ]
+}
