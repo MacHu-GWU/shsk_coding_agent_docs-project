@@ -106,7 +106,7 @@ github.com/owner_github_username/marketplace-name/
       "name": "plugin-name-1",
       "source": {
         "source": "git-subdir",
-        "url": "owner_github_username/plugin-name-1",
+        "url": "https://github.com/owner_github_username/plugin-name-1",
         "path": ".claude/skills/plugin-name-1",
         "ref": "plugin-name-1--v0.1.1"
       },
@@ -116,7 +116,7 @@ github.com/owner_github_username/marketplace-name/
       "name": "plugin-name-2",
       "source": {
         "source": "git-subdir",
-        "url": "owner_github_username/plugin-name-2",
+        "url": "https://github.com/owner_github_username/plugin-name-2",
         "path": ".claude/skills/plugin-name-2",
         "ref": "plugin-name-2--v0.3.0"
       },
@@ -126,11 +126,13 @@ github.com/owner_github_username/marketplace-name/
 }
 ```
 
-`ref` 钉的是插件 repo 上的一个 git tag. 我用官方的 `{插件名}--v{版本}` 命名法 (例如 `plugin-name-1--v0.1.1`), 这个 tag 由 `claude plugin tag` 生成 (见第 8 节). `ref` 可以是任意已存在的 git tag 名, 所以这个字符串完全合法. `url` 支持 `owner/repo` 简写, 不用写完整 URL.
+`ref` 钉的是插件 repo 上的一个 git tag. 我用官方的 `{插件名}--v{版本}` 命名法 (例如 `plugin-name-1--v0.1.1`), 这个 tag 由 `claude plugin tag` 生成 (见第 8 节). `ref` 可以是任意已存在的 git tag 名, 所以这个字符串完全合法.
 
 > 为什么用 `{插件名}--v{版本}` 而不是裸的 `0.1.1`: 这是 Claude Code 官方的插件发布 tag 命名法, 好处是 tag 自带插件名前缀 (一个 repo 里将来放多个插件也不会撞 tag), 而且它是 "将来若要上版本约束依赖" 的先决条件, 现在就用等于把那条路预留好了 (见第 5 节). 版本号本身仍是 `0.1.1` 无 v 前缀, `v` 只是 `--v` 这个分隔符的一部分.
 
-有一个坑要记住. 相对路径 source (以 `./` 开头的那种) 只在用户从 git 源或本地目录添加 marketplace 时才解析得了; 如果用户是直接给一个 `marketplace.json` 文件的裸 URL, 相对路径会失效. 我用的是 `git-subdir` 加 `owner/repo`, 且让用户用 `/plugin marketplace add owner_github_username/marketplace-name` 这种方式添加, 所以不受这个坑影响.
+有一个坑要记住. 相对路径 source (以 `./` 开头的那种) 只在用户从 git 源或本地目录添加 marketplace 时才解析得了; 如果用户是直接给一个 `marketplace.json` 文件的裸 URL, 相对路径会失效. 我用的是 `git-subdir` 加完整 URL, 且让用户用 `/plugin marketplace add owner_github_username/marketplace-name` 这种方式添加, 所以不受这个坑影响.
+
+还有一个坑是我实测踩过的: `git-subdir` 的 `url` 字段**必须写完整的 `https://github.com/owner/repo` URL, 不要用 `owner/repo` 简写**. 简写时 Claude Code 会把它拼成 SSH 远程 (`git@github.com:owner/repo.git`) 去 clone, 如果这台机器从没配过 SSH (没有 `~/.ssh` 目录, 没有已信任的 host key, 没有注册到 GitHub 账号的 key), 装插件会直接报错 `Host key verification failed` / `Permission denied (publickey)`, 而且这个坑跟仓库是不是 public 无关 (SSH 协议本身就要认证, 不像 HTTPS 能匿名拉公开仓库). 写成完整 `https://` URL 就会走 HTTPS 匿名 clone, 公开仓库不需要任何凭证就能装. 我在 2.3 里 `extraKnownMarketplaces` 用的 `github` source (`repo` 字段, 不是 `url`) 目前没观察到这个问题, 但保险起见同样建议只在真的需要私有仓库认证时才依赖 SSH, 参见第 7 节.
 
 ### 2.3 User workspace repo 的结构与关键文件
 
@@ -150,7 +152,8 @@ github.com/user_github_username/user-workspace-repo/
     "marketplace-name": {
       "source": {
         "source": "github",
-        "repo": "owner_github_username/marketplace-name"
+        "repo": "owner_github_username/marketplace-name",
+        "ref": "0.1.1"
       }
     }
   },
@@ -162,6 +165,8 @@ github.com/user_github_username/user-workspace-repo/
 ```
 
 注意 `extraKnownMarketplaces` 里指向 marketplace repo 用的是普通 `github` source (marketplace.json 就在那个 repo 根的 `.claude-plugin/` 下, 不是子目录), 这和 2.2 里 marketplace 指向各插件用 `git-subdir` 是两码事, 别混. 装上后拉哪个版本的插件代码, 由 marketplace.json 里那条的 `ref` 决定, 使用者这边不用管版本.
+
+`github` source 也支持可选的 `ref` 字段, 钉 marketplace repo 自己的 branch/tag/commit. 不写 `ref` 就一直跟 marketplace repo 默认分支的 HEAD 走, 我每次 push 新 commit (哪怕还没改 `marketplace.json`) 都可能影响已装用户; 写了 `ref` 就钉死在那个点上, 要升级只能手动把 `ref` 改成下一个 tag. 这个 `ref` 用的是 marketplace repo 自己的版本 tag (裸的 `x.y.z`, 没有 `v` 前缀, 比如 `mise run release` 或 `cookiecutter-pywf_open_source` 模板自带的 release 任务打出来的那种), 和 2.2 里插件 repo 上 `{插件名}--v{版本}` 那套 tag 是两回事, 别混. 是否要钉 `ref`, 取决于我要不要给 marketplace repo 本身的更新节奏加保障; 个人用不那么敏感的话不钉也没事.
 
 ---
 
@@ -394,3 +399,4 @@ graph LR
 | skill 调用名 | 接受 `plugin-name:skill-name` 前缀 | 前缀是插件固有身份, 且测的是真实发布形态 |
 | 用户侧安装 | workspace repo 的 `.claude/settings.json` 声明式装 | clone 即用, 配置进版本控制 |
 | 私有仓库认证 | 手动走 `gh auth setup-git`, 自动更新配 `GH_TOKEN` | gh 能替我配好 git 凭证, 不用手写 |
+| `git-subdir` 的 `url` 字段写法 | 完整 `https://github.com/owner/repo`, 不用 `owner/repo` 简写 | 简写会被拼成 SSH 远程去 clone, 没配 SSH 的机器会卡在 host key / publickey 认证; 完整 https URL 走匿名 HTTPS, 公开仓库不需要凭证 (实测踩过的坑) |
