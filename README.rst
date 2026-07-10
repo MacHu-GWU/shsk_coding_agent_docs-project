@@ -54,7 +54,7 @@ Welcome to ``shsk_coding_agent_docs`` Documentation
 
 On top of that foundation, the project adds a knowledge base that maps the same concept (hooks, MCP servers, subagents, permissions, ...) across agents, and a family of skills that port a project's configuration from one agent to another.
 
-Everything meant for external use ships as a single Claude Code plugin, ``coding-agent-docs``, under ``.claude/skills/coding-agent-docs/``. See the `Maintainer Guide <https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/tree/main/docs/source/99-Maintainer-Guide>`_ for how the plugin is organized and maintained.
+Everything meant for external use ships as a single Claude Code plugin, ``coding-agent-docs``, under `.claude/skills/coding-agent-docs/ <https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/tree/main/.claude/skills/coding-agent-docs>`_. See the `Maintainer Guide <https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/tree/main/docs/source/99-Maintainer-Guide>`_ for how the plugin is organized and maintained.
 
 
 .. _install:
