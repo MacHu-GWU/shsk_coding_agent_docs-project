@@ -74,4 +74,30 @@ flowchart TD
 
 **尽量原样传达文档内容,不要激进地和旧知识融合。** 用户要的是当前权威行为,而不是一份掺了过时假设的综述。
 
-理解了这五节,你就明白这个 Skill 为什么把索引做成本地文件、为什么不直接现查 `llms.txt`、为什么把刷新的活儿甩给另一个构建器 Skill。它和 `antigravity-docs-index-builder` 是一对:构建器负责"文档地图始终新鲜、描述始终有信息量",这个 Skill 负责"基于地图给出可靠答案"。
+---
+
+## 6. 人类怎么手动复现(以及一个容易踩的 gzip 陷阱)
+
+如果你想自己拿终端验证一下某个 `content_url` 到底能不能抓、内容长什么样,直接 `curl` 大概率会踩坑——**裸 `curl` 拿到的不是 Markdown,甚至看起来不是文本,而是一坨二进制/乱码**,原因和"抓不抓得到"无关,是另外两件事叠在一起:
+
+1. **返回的本来就是 HTML,不是 Markdown。** `https://antigravity.google/docs/<slug>` 这类地址返回的是服务端渲染好的网页源码(一堆 `<div class="docs-main-content">`、`<script>`、埋点代码),不是纯 Markdown 文件。你在这个 Skill 的回答里看到的"Markdown 正文",是 WebFetch 工具抓到 HTML 之后**自己转换**出来的,服务器并不提供现成的 `.md` 文件——这也是为什么第 3 节说"不要去猜 `/assets/docs/...` 地址",那条路已经不存在了,唯一能抓的就是这个会返回 HTML 的页面 URL。
+2. **这台服务器不管你要不要,一律强制 gzip 压缩。** 哪怕你在请求头里明确写 `Accept-Encoding: identity`(意思是"别压缩"),它照样压缩返回。而 `curl` 默认既不会主动请求 gzip,也不会自动解压——所以裸 `curl url` 拿到的就是原始 gzip 字节,终端把它当文本打印出来,自然是乱码;这正是你看到的"一堆 binary/像 JS"的来源。
+
+正确的手动验证姿势,分两步:
+
+```bash
+# 第一步:确认地址活着、内容是不是预期的 HTML(注意 --compressed,少了这个 flag 就是乱码)
+curl -sI --compressed "https://antigravity.google/docs/rules-workflows"   # 看状态码是不是 200
+curl -s --compressed "https://antigravity.google/docs/rules-workflows" | head -c 500   # 看前几百字节像不像 HTML
+
+# 第二步:想看转换成可读文本之后的样子,直接用浏览器打开这个 URL 最省事;
+# 或者用 antigravity-docs-index-builder/scripts/build_manifest.py 里同款的正则,粗提一下正文段落
+curl -s --compressed "https://antigravity.google/docs/rules-workflows" | \
+  grep -oE '<div class="caption template-content-paragraph"[^>]*>.*?</div>'
+```
+
+`antigravity-docs-index-builder` 的 `build_manifest.py` 里就踩过并处理过这个 gzip 陷阱——它的 `fetch()` 函数会检测响应开头是不是 gzip 魔数字节(`\x1f\x8b`),是的话手动用 Python 的 `gzip` 模块解开,而不是依赖 `urllib`/`curl` 的默认行为。你自己手动验证时,记得 `curl` 要加 `--compressed`,别的语言/工具同理要显式做 gzip 解压这一步,否则会误以为页面"抓不到"或者"返回的是垃圾数据"。
+
+---
+
+理解了这六节,你就明白这个 Skill 为什么把索引做成本地文件、为什么不直接现查 `llms.txt`、为什么把刷新的活儿甩给另一个构建器 Skill。它和 `antigravity-docs-index-builder` 是一对:构建器负责"文档地图始终新鲜、描述始终有信息量",这个 Skill 负责"基于地图给出可靠答案"。
