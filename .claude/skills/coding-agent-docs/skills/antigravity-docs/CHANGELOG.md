@@ -2,6 +2,11 @@
 
 All notable changes to the `antigravity-docs` skill are documented here.
 
+## [0.2.1] - 2026-07-25
+
+- Antigravity's docs site moved from a client-rendered SPA to a server-rendered Astro app. `content_url` in the manifest is now the doc page URL itself (`https://antigravity.google/docs/<slug>`) — WebFetch it directly, no more separate `/assets/docs/....md` twin.
+- Manifest regenerated via `antigravity-docs-index-builder` v0.2.0: richer per-page descriptions (scraped lead paragraph instead of `llms.txt` boilerplate) and finer breadcrumb sections. 77 pages, up from 66.
+
 ## [0.1.1] - 2026-07-03
 
 - Initial release.

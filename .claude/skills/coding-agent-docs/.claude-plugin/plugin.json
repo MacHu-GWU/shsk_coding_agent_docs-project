@@ -1,7 +1,7 @@
 {
   "name": "coding-agent-docs",
   "description": "Grounded, always-current documentation lookup for Claude Code, Codex, and Antigravity, a cross-tool concept-mapping knowledge base, and skills to port a project's agent configuration between the three tools.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "Sanhe Hu",
     "email": "husanhe@email.com"

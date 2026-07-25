@@ -1,6 +1,6 @@
 ---
 name: antigravity-docs-index-builder
-description: Rebuild the docs-manifest.json that the antigravity-docs skill relies on, by extracting the DOCS_STRUCTURE map from the live Antigravity web app JS bundle and enriching it with titles/descriptions from llms.txt. Use when Antigravity has shipped new/renamed/removed doc pages, when antigravity-docs reports a stale or missing page, or when you simply want to refresh the manifest. Manually invoked (e.g. /antigravity-docs-index-builder).
+description: Rebuild the docs-manifest.json that the antigravity-docs skill relies on, by parsing the page list from antigravity.google/llms.txt and scraping each server-rendered /docs/<slug> page for its breadcrumb, title, and lead-paragraph description. Use when Antigravity has shipped new/renamed/removed doc pages, when antigravity-docs reports a stale or missing page, or when you simply want to refresh the manifest. Manually invoked (e.g. /antigravity-docs-index-builder).
 argument-hint: [--force]
 allowed-tools: Bash, Read, Write
 ---
@@ -11,17 +11,16 @@ Regenerates `.claude/skills/coding-agent-docs/skills/antigravity-docs/references
 
 ## Why this skill has to exist
 
-Unlike Claude Code and Codex — whose doc pages have raw `.md` twins you can fetch directly — `antigravity.google/docs/*` is a **client-rendered SPA**. A plain fetch of a doc page returns an empty shell, and there is no `.md` twin at the page URL and no `llms-full.txt`. So the doc list can't be scraped by fetching pages.
+`antigravity.google/docs/*` used to be a **client-rendered SPA** — a plain fetch of a doc page returned an empty shell, so the only way to build a page list was to reverse-engineer a `DOCS_STRUCTURE` array out of the app's JS bundle, and content had to be fetched from a separate `/assets/docs/<path>/<filename>.md` twin.
 
-But the app ships the map and the content as static resources, if you know where to look:
+As of 2026-07 Antigravity rebuilt the site as a **server-rendered Astro app**. `/docs/<slug>` now returns real HTML with the doc body baked in — no bundle, no `.md` twin, both of the old URLs 404 now. So this builder instead:
 
-1. **The JS bundle** (`main-<hash>.js`) embeds a `DOCS_STRUCTURE` array of `{section, path, slug, filename}` records — the authoritative list of every doc page.
-2. **The real Markdown** for each page lives at `https://antigravity.google/assets/docs/<path>/<filename>.md` (pristine, with frontmatter — this is what `antigravity-docs` fetches).
-3. **`llms.txt`** lists `- [Title](/docs/<slug>): description` — human-readable titles and one-line descriptions, joinable to `DOCS_STRUCTURE` on `slug` (verified: a 1:1 join).
-
-This builder stitches (1) + (3) into the manifest and records the content URLs from (2).
-
-> **Critical:** the bundle must be fetched as **raw bytes** (`curl`/`urllib`), never through a markdown-converting fetcher like WebFetch — that strips `<script>` tags and the `DOCS_STRUCTURE` data with them. That's why this skill uses `Bash`, not `WebFetch`.
+1. Fetches **`llms.txt`**, which lists every doc page under `## Documentation` as `- [Title](https://antigravity.google/docs/<slug>): description`, grouped by `### <product>` headings — this is now the authoritative page list (no bundle needed). Its descriptions are boilerplate ("Learn about X"), so they're only a fallback.
+2. Fetches **each page directly** and scrapes three things out of the server-rendered HTML:
+   - the breadcrumb trail (`docs-main-content` nav) — richer than llms.txt's flat section, e.g. `Antigravity 2.0 / Customizations / Skills`
+   - the `<h1>` title
+   - the lead paragraph (`template-content-paragraph`) as a real description, capped at 280 chars
+3. Records `content_url` as **the page URL itself** (`https://antigravity.google/docs/<slug>`) — it's directly fetchable now (WebFetch renders the SSR HTML fine), so `antigravity-docs` no longer needs a separate asset URL.
 
 ## Procedure
 
@@ -33,26 +32,27 @@ python3 .claude/skills/antigravity-docs-index-builder/scripts/build_manifest.py
 
 - Set today's date so the manifest is stamped:
   `ANTIGRAVITY_BUILD_DATE=<YYYY-MM-DD> python3 .../build_manifest.py`
-- Pass `--force` (or `$ARGUMENTS`) to rebuild even when the bundle hash is unchanged.
+- Pass `--force` (or `$ARGUMENTS`) to rebuild even when `llms.txt` is unchanged.
 
-What it does: discovers the current `main-<hash>.js` from `https://antigravity.google/docs/home`, and **short-circuits if that bundle name matches the one already recorded in the manifest** (docs structure unchanged → nothing to do). Otherwise it downloads the bundle, parses `DOCS_STRUCTURE`, fetches and joins `llms.txt`, and writes the manifest — printing the added/removed page slugs versus the previous version.
+What it does: fetches `llms.txt` and **short-circuits if its hash matches the one already recorded in the manifest** (page list unchanged → nothing to do — note this only catches list changes; a page's body can be edited without llms.txt changing, so `--force` periodically is reasonable). Otherwise it parses the page list, fetches every `/docs/<slug>` page (~77 requests, throttled), scrapes breadcrumb/title/description from each, and writes the manifest — printing the added/removed page slugs versus the previous version and any pages that failed to scrape (those fall back to llms.txt's title/section/boilerplate description).
 
 ### 2. Report the result
 
-Relay to the user: the bundle name, page count, and the added/removed diff. If pages were added or removed, that's the signal that `antigravity-docs` now covers new material (or dropped stale slugs).
+Relay to the user: the page count, and the added/removed diff. If pages were added or removed, that's the signal that `antigravity-docs` now covers new material (or dropped stale slugs).
 
 ### 3. If the script errors
 
-The script fails loudly (rather than writing a bad manifest) in two cases, both meaning Antigravity changed something structural:
+The script fails loudly (rather than writing a bad manifest) if the page-list format changes:
 
-- **"could not find main-<hash>.js"** — the app shell markup changed. `curl -s https://antigravity.google/docs/home | grep -oE 'src="[^"]*"'` to find the new bundle-reference pattern, then update `find_bundle_name`.
-- **"DOCS_STRUCTURE not found"** — the record shape changed. Download the bundle, `grep -oE '.{40}filename:"[^"]*".{20}' bundle.js` to see the new object shape, then update `parse_structure`.
+- **"'## Documentation' section not found in llms.txt"** or **"no documentation pages parsed"** — `llms.txt`'s structure changed. `curl -s https://antigravity.google/llms.txt` and re-derive `parse_llms_doc_pages`'s heading/line regex.
+
+A scrape failure on an individual page is **not** fatal — it's logged and that page falls back to llms.txt-derived fields. If breadcrumb/title/description come back empty for most or all pages (not just a few flaky ones), the site's HTML structure changed — `curl -s --compressed <a /docs/<slug> URL> -o page.html` and re-derive `BREADCRUMB_RE`/`H1_RE`/`DESC_RE` from the new class names around `docs-main-content`.
 
 Fix the script, re-run, and note what changed in this skill's `CHANGELOG.md`.
 
 ## Rules
 
 - **Never hand-edit `docs-manifest.json`.** It is generated. Any manual fix will be silently overwritten on the next run — fix the builder instead.
-- **Raw fetch only for the bundle.** WebFetch cannot see the `DOCS_STRUCTURE` data. Use `curl`/Python.
-- **Verify the join.** If the script reports pages with no `llms.txt` description, that's tolerable (it falls back to a filename-derived title) but worth a glance — a large unmatched count usually means the slug scheme drifted between the bundle and `llms.txt`.
-- **Don't widen scope.** This builder only writes the manifest for `antigravity-docs`. It does not fetch or cache page content — that's `antigravity-docs`' job at answer time.
+- **Raw fetch, not WebFetch, when scraping HTML markup.** The builder needs exact class names (`breadcrumb-list`, `template-content-paragraph`) to regex out of raw HTML; a markdown-converting fetcher would lose that structure. That's why this skill uses `Bash`, not `WebFetch`.
+- **A large scrape-failure count is a signal, not noise.** A page or two failing (timeout, transient 5xx) is fine and falls back gracefully. Most/all pages failing to yield a breadcrumb or description means the HTML structure changed — investigate before trusting the manifest.
+- **Don't widen scope.** This builder only writes the manifest for `antigravity-docs`. It does not fetch or cache full page content — that's `antigravity-docs`' job at answer time.
