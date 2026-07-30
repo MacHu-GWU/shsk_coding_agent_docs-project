@@ -41,4 +41,4 @@ coding-agent-concept-mapping/
     └── XY-concept-name.md     每个概念一份的详情文件, 由 builder 撰写
 ```
 
-目前详情文件尚未开始填充,索引也还是空的框架。随着每个概念被 builder 逐一撰写,索引里会按注册表顺序长出对应的小节。
+目前已映射的概念,按注册表顺序:project prompt、project settings、skills、custom commands、hooks、MCP servers、subagents、permissions、plugins and marketplaces。每新增一个概念,builder 会先写详情文件,再把它汇总进索引。

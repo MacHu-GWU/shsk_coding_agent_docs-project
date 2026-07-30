@@ -66,11 +66,11 @@ All three trigger with a leading slash, but they differ on where user commands c
 
 **Codex**
 
-- Custom Prompts: https://developers.openai.com/codex/custom-prompts.md
-- Agent Skills: https://developers.openai.com/codex/skills.md
+- Custom Prompts: https://learn.chatgpt.com/docs/custom-prompts.md
+- Agent Skills: https://learn.chatgpt.com/docs/build-skills.md
 
 **Antigravity**
 
-- CLI Plugins: https://antigravity.google/assets/docs/cli/cli-plugins.md
-- CLI Reference: https://antigravity.google/assets/docs/cli/cli-reference.md
-- Rules and Workflows: https://antigravity.google/assets/docs/antigravity-2-0/rules-workflows.md
+- CLI Plugins: https://antigravity.google/docs/cli/plugins
+- CLI Reference: https://antigravity.google/docs/cli/reference
+- Rules and Workflows: https://antigravity.google/docs/rules-workflows

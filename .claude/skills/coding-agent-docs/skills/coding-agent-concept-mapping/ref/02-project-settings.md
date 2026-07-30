@@ -81,16 +81,16 @@ Beyond the shared idea of a config file, each tool adds its own layer for person
 
 **Codex**
 
-- Config basics: https://developers.openai.com/codex/config-basic.md
-- Configuration Reference: https://developers.openai.com/codex/config-reference.md
-- Sample Configuration: https://developers.openai.com/codex/config-sample.md
-- Advanced Configuration: https://developers.openai.com/codex/config-advanced.md
+- Config basics: https://learn.chatgpt.com/docs/config-file/config-basic.md
+- Configuration Reference: https://learn.chatgpt.com/docs/config-file/config-reference.md
+- Sample Configuration: https://learn.chatgpt.com/docs/config-file/config-sample.md
+- Advanced Configuration: https://learn.chatgpt.com/docs/config-file/config-advanced.md
 
 **Antigravity**
 
-- CLI Settings: https://antigravity.google/assets/docs/cli/cli-settings.md
-- CLI Reference: https://antigravity.google/assets/docs/cli/cli-reference.md
-- CLI Permissions: https://antigravity.google/assets/docs/cli/cli-permissions.md
-- CLI Sandbox: https://antigravity.google/assets/docs/cli/cli-sandbox.md
-- Model Context Protocol: https://antigravity.google/assets/docs/antigravity-2-0/mcp.md
-- Enterprise Features: https://antigravity.google/assets/docs/enterprise/enterprise.md
+- CLI Settings: https://antigravity.google/docs/cli/settings
+- CLI Reference: https://antigravity.google/docs/cli/reference
+- CLI Permissions: https://antigravity.google/docs/cli/permissions
+- CLI Sandbox: https://antigravity.google/docs/cli/sandbox
+- Model Context Protocol: https://antigravity.google/docs/mcp
+- Enterprise Features: https://antigravity.google/docs/enterprise

@@ -1,6 +1,6 @@
 ---
 name: coding-agent-concept-mapping
-description: Cross tool concept mapping knowledge base for AI coding agents. Use when you need to know how a project level configuration concept (project prompt, settings, skills, custom commands, hooks, MCP servers, subagents, permissions) corresponds across Claude Code, Codex, and Antigravity, or how to port such a setup from one tool to another.
+description: Cross tool concept mapping knowledge base for AI coding agents. Use when you need to know how a project level configuration concept (project prompt, settings, skills, custom commands, hooks, MCP servers, subagents, permissions, plugins and marketplaces) corresponds across Claude Code, Codex, and Antigravity, or how to port such a setup from one tool to another.
 argument-hint: [concept name]
 allowed-tools: Read
 ---

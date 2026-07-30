@@ -92,10 +92,11 @@ detail file, claim its row here so two sessions never mint the same number.
 | 06 | MCP servers | `06-mcp-servers.md` | Model Context Protocol integration and config |
 | 07 | Subagents | `07-subagents.md` | Delegated agents with their own prompt and tools |
 | 08 | Permissions | `08-permissions.md` | Tool execution control, allow and deny and sandbox |
+| 09 | Plugins and marketplaces | `09-plugins-and-marketplaces.md` | The plugin package, its manifest, and the catalog that distributes it |
 
-Numbers 09 and up are open. Candidate concepts that may earn a number once a
+Numbers 10 and up are open. Candidate concepts that may earn a number once a
 real cross tool equivalence is confirmed: rules directories, workflows, output
-styles, plugins, and dedicated memory stores. Do not create a file for a
+styles, and dedicated memory stores. Do not create a file for a
 candidate until it has a registry row. A concept that turns out to exist in only
 one tool does not belong here at all.
 
@@ -175,16 +176,23 @@ exist precisely because the tools change often and training data goes stale.
 
 The `Sources` section at the foot of each file records what was read, so a
 later maintainer can re verify without redoing the discovery. List the doc pages
-per tool as title and URL, and the URL must be the fetchable raw `.md` source
-that the doc skill actually retrieved, never a human facing rendered page. For
-Claude Code and Codex the `.md` twin is the page URL with a `.md` suffix, so
-`https://code.claude.com/docs/en/memory.md` and
-`https://developers.openai.com/codex/config-reference.md` are correct. Antigravity
-is the trap: its docs site is a client rendered single page app, so the SPA path
-`https://antigravity.google/docs/ide/rules` is not fetchable. The real source is
-the `/assets/docs/....md` twin listed in the `docs-manifest.json`, for example
-`https://antigravity.google/assets/docs/editor/ide-rules.md`. Always record the
-`/assets/docs/....md` form for Antigravity. If a fact could not be confirmed in
+per tool as title and URL, and the URL must be the one the doc skill actually
+retrieved content from, never a link that only renders for a human.
+
+Claude Code publishes a `.md` twin at the page URL with a `.md` suffix, so
+`https://code.claude.com/docs/en/memory.md` is correct. Codex has moved: the
+`https://developers.openai.com/codex/<slug>.md` URLs now issue a 308 to
+`https://learn.chatgpt.com/docs/<slug>.md`, and `codex/llms.txt` redirects to a
+404, so record the `learn.chatgpt.com` URL that actually served the page. Codex
+plugin and skill building pages still live at
+`https://developers.openai.com/plugins/...md` and fetch directly, with the whole
+map at `https://developers.openai.com/llms.txt`. Antigravity is now server
+rendered, so the page URL `https://antigravity.google/docs/cli/plugins` is
+fetchable and is the `content_url` recorded in the `antigravity-docs` skill's
+`docs-manifest.json`. Record that page URL. The older
+`/assets/docs/....md` twins are gone and must not be used.
+
+If a fact could not be confirmed in
 the docs, do not launder it into a confident claim. Either leave the cell honest
 with a short `unconfirmed` note, or omit the row.
 

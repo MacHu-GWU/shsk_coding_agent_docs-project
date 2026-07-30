@@ -82,10 +82,10 @@ Beyond the shared file mechanics, each tool adds distinctive capabilities around
 
 **Codex**
 
-- Custom instructions with AGENTS.md: https://developers.openai.com/codex/guides/agents-md.md
-- Memories: https://developers.openai.com/codex/memories.md
-- Configuration Reference: https://developers.openai.com/codex/config-reference.md
+- Custom instructions with AGENTS.md: https://learn.chatgpt.com/docs/agent-configuration/agents-md.md
+- Memories: https://learn.chatgpt.com/docs/customization/memories.md?surface=app
+- Configuration Reference: https://learn.chatgpt.com/docs/config-file/config-reference.md
 
 **Antigravity**
 
-- Rules and Workflows: https://antigravity.google/assets/docs/antigravity-2-0/rules-workflows.md
+- Rules and Workflows: https://antigravity.google/docs/rules-workflows
