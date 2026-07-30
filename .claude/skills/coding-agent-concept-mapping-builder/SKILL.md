@@ -1,6 +1,6 @@
 ---
 name: coding-agent-concept-mapping-builder
-description: Author and maintain the cross tool concept mapping knowledge base under .claude/skills/coding-agent-concept-mapping/. Use when adding a new concept, refreshing an existing XY-concept-name.md against current docs, or rolling the concept files up into 00-context-index.md. Grounds every claim in the claude-code-docs, codex-docs, and antigravity-docs skills and follows ref/mapping-file-standard.md.
+description: Author and maintain the cross tool concept mapping knowledge base under .claude/skills/coding-agent-docs/skills/coding-agent-concept-mapping/. Use when adding a new concept, refreshing an existing XY-concept-name.md against current docs, or rolling the concept files up into 00-context-index.md. Grounds every claim in the claude-code-docs, codex-docs, and antigravity-docs skills and follows ref/mapping-file-standard.md.
 argument-hint: [concept name or XY number]
 allowed-tools: Read, Write, Edit, WebFetch, Skill
 ---
@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, WebFetch, Skill
 # Concept Mapping Builder
 
 Builds and maintains the concept mapping knowledge base that lives in the
-sibling skill at `.claude/skills/coding-agent-concept-mapping/`. That knowledge base explains
+sibling skill at `.claude/skills/coding-agent-docs/skills/coding-agent-concept-mapping/`. That knowledge base explains
 how each project level configuration concept in Claude Code maps onto Codex and
 Antigravity, and what to watch when porting a setup between them. This builder is
 how those files get written and kept current. The `coding-agent-concept-mapping` skill only
@@ -19,7 +19,7 @@ or update. Otherwise infer it from the conversation, or ask which concept.
 
 ## What it maintains
 
-Two kinds of file, both under `.claude/skills/coding-agent-concept-mapping/ref/`:
+Two kinds of file, both under `.claude/skills/coding-agent-docs/skills/coding-agent-concept-mapping/ref/`:
 
 - `XY-concept-name.md` — one detail file per concept, the real content. This is
   authored or updated first.
@@ -67,7 +67,7 @@ titles and URLs you relied on. They become the `Sources` section.
 
 ### 4. Write or update the detail file first
 
-Author `.claude/skills/coding-agent-concept-mapping/ref/XY-concept-name.md` to the standard.
+Author `.claude/skills/coding-agent-docs/skills/coding-agent-concept-mapping/ref/XY-concept-name.md` to the standard.
 Start from `ref/concept-file-template.md`, fill every cell, delete all comments,
 and record sources. Use `No equivalent` rather than a blank when a tool lacks an
 aspect. When updating, change only what the refreshed docs require and keep the
@@ -102,5 +102,10 @@ or leave `unconfirmed`.
   [ref/mapping-file-standard.md](ref/mapping-file-standard.md) is authoritative.
 - **No blank cells.** A tool without an equivalent gets `No equivalent` and a
   few words of context, never an empty cell.
+- **Never point at this builder with a relative path.** The knowledge base ships
+  inside the `coding-agent-docs` plugin and this builder does not, so a relative
+  link is broken by construction once the plugin is installed elsewhere. Use the
+  absolute URL, and say that the builder does not ship with the plugin:
+  `https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/blob/main/.claude/skills/coding-agent-concept-mapping-builder/SKILL.md`
 - **Stay in scope.** Only project level, portable configuration concepts belong
   in the knowledge base. If a concept exists in only one tool, it does not go in.

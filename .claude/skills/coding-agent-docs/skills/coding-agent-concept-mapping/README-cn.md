@@ -28,6 +28,8 @@
 
 要新增一个概念、按最新文档刷新某个概念、或者修正某处映射,都走 `coding-agent-concept-mapping-builder`,这样所有文件才会保持一致的结构和口径。不要在这里手工添加新事实。
 
+builder 是维护者侧的工具,不随本 plugin 一起分发,所以这里给的是绝对链接: https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/blob/main/.claude/skills/coding-agent-concept-mapping-builder/SKILL.md
+
 ---
 
 ## 4. 目录结构

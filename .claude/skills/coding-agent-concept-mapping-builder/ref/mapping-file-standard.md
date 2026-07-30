@@ -1,7 +1,7 @@
 # Concept Mapping File Standard
 
 This document is the authoritative specification for every file the
-`coding-agent-concept-mapping-builder` skill writes into `.claude/skills/coding-agent-concept-mapping/`.
+`coding-agent-concept-mapping-builder` skill writes into `.claude/skills/coding-agent-docs/skills/coding-agent-concept-mapping/`.
 It exists so that many independent authoring sessions can each produce one
 concept file and still end up with a knowledge base that reads as if a single
 hand wrote it. When a rule here conflicts with habit or with the old
@@ -68,7 +68,7 @@ tools already present.
 
 ## 3. File layout, naming, and the concept registry
 
-Every file lives under `.claude/skills/coding-agent-concept-mapping/ref/`. Detail files are
+Every file lives under `.claude/skills/coding-agent-docs/skills/coding-agent-concept-mapping/ref/`. Detail files are
 named `XY-concept-name.md`, where `XY` is a two digit zero padded number and
 `concept-name` is lower case kebab case. The number `00` is reserved for the
 index. Concepts take `01` and up, in the order fixed by the registry below.
@@ -241,6 +241,29 @@ table whose rows are the tools and whose single data column names that tool's
 primary file or location for the concept, and a link to the detail file. The
 opening blurb and the primary location must agree with the detail file. If they
 drift, the detail file is right and the index is what gets corrected.
+
+### Never link to this builder with a relative path
+
+The opening paragraph points a reader at this builder as the place the registry
+and the format live. Write that pointer as the absolute URL below, never as a
+relative path.
+
+```
+https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/blob/main/.claude/skills/coding-agent-concept-mapping-builder/SKILL.md
+```
+
+The reason is a packaging boundary. The knowledge base ships inside the
+`coding-agent-docs` plugin, whose root is `.claude/skills/coding-agent-docs/`.
+This builder lives at `.claude/skills/coding-agent-concept-mapping-builder/`,
+outside that root, and is deliberately not published with the plugin because it
+is a maintainer tool. So no number of `../` hops can reach it from a generated
+file once the plugin is installed on someone else's machine. A relative link
+there is broken by construction, not by a miscount. Say in the same sentence
+that the builder does not ship with the plugin, so a reader who cannot open it
+understands why.
+
+The same rule applies to the `Maintenance` section of the knowledge base's own
+`SKILL.md`, which carries the identical pointer.
 
 ---
 

@@ -46,8 +46,9 @@ mapped yet.
 
 ## Maintenance
 
-This knowledge base is authored and kept current by the `coding-agent-concept-mapping-builder`
-skill, which grounds every claim in the `coding-agent-docs:claude-code-docs`, `coding-agent-docs:codex-docs`, and
-`coding-agent-docs:antigravity-docs` skills. Do not add new facts by hand here. To add a concept,
-refresh one against current docs, or fix a mapping, use `coding-agent-concept-mapping-builder`
-so the files stay consistent with [its standard](../coding-agent-concept-mapping-builder/ref/mapping-file-standard.md).
+Every file here is generated. Do not add new facts by hand. To add a concept,
+refresh one against current docs, or fix a mapping, use the maintainer side
+`coding-agent-concept-mapping-builder` skill, which grounds every claim in the
+`coding-agent-docs:claude-code-docs`, `coding-agent-docs:codex-docs`, and
+`coding-agent-docs:antigravity-docs` skills, and which does not ship with this
+plugin: https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/blob/main/.claude/skills/coding-agent-concept-mapping-builder/SKILL.md

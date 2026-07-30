@@ -9,6 +9,7 @@ All notable changes to the `coding-agent-concept-mapping` skill are documented h
 - Resolved the MCP precedence cell in `06-mcp-servers.md` from `unconfirmed` to workspace over global, sourced from the new `cli/mcp` page, and added the `cwd` and `disabled` keys plus a transport row.
 - Sharpened the Antigravity global skills path in `03-skills.md` to name both paths the two doc sets disagree on, rather than picking one silently.
 - Replaced every dead Antigravity `assets/docs/....md` source URL with the server-rendered page URL, and re-pointed every Codex `developers.openai.com/codex/*.md` source at the `learn.chatgpt.com/docs/*` location it now redirects to. All 51 source URLs in the knowledge base verified reachable.
+- Fixed the maintenance pointer in `SKILL.md`, `README-cn.md`, and `00-context-index.md`. It was a relative path to `coding-agent-concept-mapping-builder`, which is unresolvable by construction: the knowledge base ships inside the `coding-agent-docs` plugin and the builder deliberately does not, so no number of `../` hops reaches it from an installed plugin. Now an absolute GitHub URL, stated in one sentence that also says the builder is maintainer side and not shipped.
 
 ## [0.1.2] - 2026-07-29
 

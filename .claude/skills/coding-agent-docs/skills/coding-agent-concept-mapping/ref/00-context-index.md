@@ -9,10 +9,12 @@ comparison and the porting notes.
 
 Concept sections are added in registry order as each detail file is authored.
 The registry that assigns concept numbers, and the format both this index and
-the detail files follow, live in the `coding-agent-concept-mapping-builder` skill at
-`../../coding-agent-concept-mapping-builder/ref/mapping-file-standard.md`. This index is
-generated from the detail files and is not a place where new facts first appear.
-When a concept below disagrees with its detail file, the detail file is correct.
+the detail files follow, live in the maintainer side
+`coding-agent-concept-mapping-builder` skill, which does not ship with this
+plugin: https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/blob/main/.claude/skills/coding-agent-concept-mapping-builder/SKILL.md
+This index is generated from the detail files and is not a place where new facts
+first appear. When a concept below disagrees with its detail file, the detail
+file is correct.
 
 ## 1. Project prompt
 

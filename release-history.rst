@@ -31,6 +31,8 @@ x.y.z (Backlog)
 
 - Refreshed the ``antigravity-docs`` manifest to 81 pages (up from 77), adding ``cli/mcp``, ``ide/mcp``, ``sdk/mcp``, and ``cli/headless``.
 - Updated the concept-mapping standard's sourcing rules to describe the current URL landscape for all three tools, and reserved registry number 09.
+- Repointed ``coding-agent-concept-mapping-builder`` at the real knowledge-base location. Every path it wrote to still said ``.claude/skills/coding-agent-concept-mapping/``, a directory that no longer exists since the knowledge base moved into the ``coding-agent-docs`` plugin at ``.claude/skills/coding-agent-docs/skills/coding-agent-concept-mapping/``. Fixed 8 occurrences across the skill body, the standard, the concept-file template, and the example prompt.
+- Replaced the generated files' maintenance pointer to the builder with an absolute GitHub URL. A relative path could never work there: the knowledge base ships inside the plugin and the builder, a maintainer-side tool, does not. Added a rule to the builder and its standard so regenerated files keep using the absolute form and say the builder is not shipped.
 
 
 0.1.2 (2026-07-25)

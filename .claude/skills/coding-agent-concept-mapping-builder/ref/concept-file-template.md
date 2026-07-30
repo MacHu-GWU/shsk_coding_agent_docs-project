@@ -1,5 +1,5 @@
 <!--
-TEMPLATE: concept file skeleton for .claude/skills/coding-agent-concept-mapping/ref/XY-concept-name.md
+TEMPLATE: concept file skeleton for .claude/skills/coding-agent-docs/skills/coding-agent-concept-mapping/ref/XY-concept-name.md
 
 Copy this file, rename it to the registered XY-concept-name.md, fill it in, and
 delete every HTML comment. The final file must contain no comments.
