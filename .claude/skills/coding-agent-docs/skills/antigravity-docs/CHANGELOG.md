@@ -2,6 +2,10 @@
 
 All notable changes to the `antigravity-docs` skill are documented here.
 
+## [0.2.2] - 2026-07-29
+
+- Manifest refreshed: 81 pages, up from 77. Added `cli/mcp`, `ide/mcp`, `sdk/mcp`, and `cli/headless`; nothing removed. The per-surface MCP pages matter because the CLI now documents its own MCP configuration rather than deferring to the Antigravity 2.0 page.
+
 ## [0.2.1] - 2026-07-25
 
 - Antigravity's docs site moved from a client-rendered SPA to a server-rendered Astro app. `content_url` in the manifest is now the doc page URL itself (`https://antigravity.google/docs/<slug>`) — WebFetch it directly, no more separate `/assets/docs/....md` twin.

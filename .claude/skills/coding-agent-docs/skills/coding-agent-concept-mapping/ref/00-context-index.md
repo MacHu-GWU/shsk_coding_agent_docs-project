@@ -9,10 +9,12 @@ comparison and the porting notes.
 
 Concept sections are added in registry order as each detail file is authored.
 The registry that assigns concept numbers, and the format both this index and
-the detail files follow, live in the `coding-agent-concept-mapping-builder` skill at
-`../../coding-agent-concept-mapping-builder/ref/mapping-file-standard.md`. This index is
-generated from the detail files and is not a place where new facts first appear.
-When a concept below disagrees with its detail file, the detail file is correct.
+the detail files follow, live in the maintainer side
+`coding-agent-concept-mapping-builder` skill, which does not ship with this
+plugin: https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/blob/main/.claude/skills/coding-agent-concept-mapping-builder/SKILL.md
+This index is generated from the detail files and is not a place where new facts
+first appear. When a concept below disagrees with its detail file, the detail
+file is correct.
 
 ## 1. Project prompt
 
@@ -123,16 +125,17 @@ Detail: [06-mcp-servers.md](06-mcp-servers.md)
 ## 7. Subagents
 
 Delegated agents with their own system prompt, tools, and isolated context, for
-focused or parallel work. Claude Code defines them in Markdown and can auto
-delegate, Codex uses TOML files and spawns only when asked, and Antigravity
-bundles them in plugins or defines them at run time and leans on background
-parallel execution. All three isolate context and return a summary.
+focused or parallel work. Claude Code and Antigravity have converged on the same
+shape, a Markdown file whose YAML frontmatter configures the agent and whose body
+is the system prompt, and both auto delegate from the `description`, while Codex
+uses TOML and spawns only when asked. All three isolate context and return a
+summary.
 
 | Tool | Primary file or location |
 |---|---|
 | Claude Code | `.claude/agents/<name>.md` |
 | Codex | `.codex/agents/<name>.toml` |
-| Antigravity | a plugin's `agents/` folder, or the runtime `define_subagent` tool |
+| Antigravity | `.agents/agents/<name>.md` |
 
 Detail: [07-subagents.md](07-subagents.md)
 
@@ -153,3 +156,22 @@ profiles, and command rules.
 | Antigravity | `permissions` in `~/.gemini/antigravity-cli/settings.json` |
 
 Detail: [08-permissions.md](08-permissions.md)
+
+---
+
+## 9. Plugins and marketplaces
+
+The package that bundles skills, subagents, hooks, MCP servers, and rules into
+one installable unit, plus the catalog that distributes it. Claude Code and
+Codex line up almost exactly: a hidden manifest directory, a `marketplace.json`
+catalog, the same git and npm source types including `git-subdir`, and a
+`plugin marketplace add` command. Antigravity has plugins but no marketplace at
+all, so a plugin arrives only as a local directory.
+
+| Tool | Primary file or location |
+|---|---|
+| Claude Code | `.claude-plugin/plugin.json`, catalog at `.claude-plugin/marketplace.json` |
+| Codex | `.codex-plugin/plugin.json`, catalog at `.agents/plugins/marketplace.json` |
+| Antigravity | `plugin.json` at the plugin root; no catalog |
+
+Detail: [09-plugins-and-marketplaces.md](09-plugins-and-marketplaces.md)

@@ -9,11 +9,11 @@ Every tool treats a skill as a folder whose entry file is `SKILL.md`, discoverab
 | Dimension | Claude Code | Codex | Antigravity |
 |---|---|---|---|
 | Entry file | `SKILL.md` | `SKILL.md` | `SKILL.md` |
-| User / global | `~/.claude/skills/<name>/` | `~/.agents/skills/<name>/` | `~/.gemini/antigravity-cli/skills/<name>/` |
+| User / global | `~/.claude/skills/<name>/` | `~/.agents/skills/<name>/` | `~/.gemini/antigravity-cli/skills/` per the CLI docs, `~/.gemini/config/skills/<name>/` per the 2.0 docs |
 | Project | `.claude/skills/<name>/` | `.agents/skills/<name>/`, scanned from the cwd up to the repo root | `.agents/skills/<name>/` (legacy `.agent/skills/`) |
 | Admin / enterprise | through managed settings | `/etc/codex/skills/` | No equivalent documented |
 | Supporting files | optional `scripts/`, plus reference and example files | optional `scripts/`, `references/`, `assets/`, and `agents/openai.yaml` | optional `scripts/`, `examples/`, `resources/` |
-| Porting-in notes | move any `.agents/skills/` folders to `.claude/skills/`, since Claude Code does not read the neutral path | the `.agents/skills/` path is shared with Antigravity, so a repo's project skills often load as is | project skills share the `.agents/skills/` path, but the global path is documented inconsistently across pages, so keep skills in the repo folder |
+| Porting-in notes | move any `.agents/skills/` folders to `.claude/skills/`, since Claude Code does not read the neutral path | the `.agents/skills/` path is shared with Antigravity, so a repo's project skills often load as is | project skills share the `.agents/skills/` path, but the two doc sets still disagree on the global path, so keep skills in the repo folder |
 
 ---
 
@@ -81,11 +81,11 @@ Beyond authoring, each tool ships starter skills, gates tools, and packages skil
 
 **Codex**
 
-- Agent Skills: https://developers.openai.com/codex/skills.md
-- Custom Prompts: https://developers.openai.com/codex/custom-prompts.md
+- Agent Skills: https://learn.chatgpt.com/docs/build-skills.md
+- Custom Prompts: https://learn.chatgpt.com/docs/custom-prompts.md
 
 **Antigravity**
 
-- Skills: https://antigravity.google/assets/docs/antigravity-2-0/skills.md
-- CLI Plugins: https://antigravity.google/assets/docs/cli/cli-plugins.md
-- CLI Reference: https://antigravity.google/assets/docs/cli/cli-reference.md
+- Skills: https://antigravity.google/docs/skills
+- CLI Plugins: https://antigravity.google/docs/cli/plugins
+- CLI Reference: https://antigravity.google/docs/cli/reference

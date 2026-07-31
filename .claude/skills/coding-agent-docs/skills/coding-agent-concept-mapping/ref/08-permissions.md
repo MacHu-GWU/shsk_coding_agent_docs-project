@@ -78,12 +78,12 @@ Every tool has an in session command to review permissions, but they differ shar
 
 **Codex**
 
-- Permissions: https://developers.openai.com/codex/permissions.md
-- Sandbox: https://developers.openai.com/codex/concepts/sandboxing.md
-- Rules: https://developers.openai.com/codex/rules.md
+- Permissions: https://learn.chatgpt.com/docs/permissions.md
+- Sandbox: https://learn.chatgpt.com/docs/sandboxing.md
+- Rules: https://learn.chatgpt.com/docs/agent-configuration/rules.md
 
 **Antigravity**
 
-- CLI Permissions: https://antigravity.google/assets/docs/cli/cli-permissions.md
-- CLI Sandbox: https://antigravity.google/assets/docs/cli/cli-sandbox.md
-- CLI Reference: https://antigravity.google/assets/docs/cli/cli-reference.md
+- CLI Permissions: https://antigravity.google/docs/cli/permissions
+- CLI Sandbox: https://antigravity.google/docs/cli/sandbox
+- CLI Reference: https://antigravity.google/docs/cli/reference

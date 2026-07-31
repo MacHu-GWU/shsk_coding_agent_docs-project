@@ -82,11 +82,11 @@ Beyond shell commands, the tools differ on what a hook can be and on the tooling
 
 **Codex**
 
-- Hooks: https://developers.openai.com/codex/hooks.md
-- Configuration Reference: https://developers.openai.com/codex/config-reference.md
+- Hooks: https://learn.chatgpt.com/docs/hooks.md
+- Configuration Reference: https://learn.chatgpt.com/docs/config-file/config-reference.md
 
 **Antigravity**
 
-- Hooks: https://antigravity.google/assets/docs/antigravity-2-0/hooks.md
-- IDE Hooks: https://antigravity.google/assets/docs/editor/ide-hooks.md
-- CLI Reference: https://antigravity.google/assets/docs/cli/cli-reference.md
+- Hooks: https://antigravity.google/docs/hooks
+- IDE Hooks: https://antigravity.google/docs/ide/hooks
+- CLI Reference: https://antigravity.google/docs/cli/reference

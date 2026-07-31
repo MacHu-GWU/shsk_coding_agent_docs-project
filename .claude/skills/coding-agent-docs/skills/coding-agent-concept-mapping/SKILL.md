@@ -1,6 +1,6 @@
 ---
 name: coding-agent-concept-mapping
-description: Cross tool concept mapping knowledge base for AI coding agents. Use when you need to know how a project level configuration concept (project prompt, settings, skills, custom commands, hooks, MCP servers, subagents, permissions) corresponds across Claude Code, Codex, and Antigravity, or how to port such a setup from one tool to another.
+description: Cross tool concept mapping knowledge base for AI coding agents. Use when you need to know how a project level configuration concept (project prompt, settings, skills, custom commands, hooks, MCP servers, subagents, permissions, plugins and marketplaces) corresponds across Claude Code, Codex, and Antigravity, or how to port such a setup from one tool to another.
 argument-hint: [concept name]
 allowed-tools: Read
 ---
@@ -46,8 +46,9 @@ mapped yet.
 
 ## Maintenance
 
-This knowledge base is authored and kept current by the `coding-agent-concept-mapping-builder`
-skill, which grounds every claim in the `coding-agent-docs:claude-code-docs`, `coding-agent-docs:codex-docs`, and
-`coding-agent-docs:antigravity-docs` skills. Do not add new facts by hand here. To add a concept,
-refresh one against current docs, or fix a mapping, use `coding-agent-concept-mapping-builder`
-so the files stay consistent with [its standard](../coding-agent-concept-mapping-builder/ref/mapping-file-standard.md).
+Every file here is generated. Do not add new facts by hand. To add a concept,
+refresh one against current docs, or fix a mapping, use the maintainer side
+`coding-agent-concept-mapping-builder` skill, which grounds every claim in the
+`coding-agent-docs:claude-code-docs`, `coding-agent-docs:codex-docs`, and
+`coding-agent-docs:antigravity-docs` skills, and which does not ship with this
+plugin: https://github.com/MacHu-GWU/shsk_coding_agent_docs-project/blob/main/.claude/skills/coding-agent-concept-mapping-builder/SKILL.md

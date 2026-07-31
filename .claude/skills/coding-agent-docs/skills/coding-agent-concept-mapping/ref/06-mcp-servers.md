@@ -22,9 +22,10 @@ Every tool supports a local stdio subprocess and a remote server reached over a 
 
 | Dimension | Claude Code | Codex | Antigravity |
 |---|---|---|---|
-| Local subprocess | `command`, `args`, `env`, with `type: stdio` | `command`, `args`, `env`, `env_vars` | `command`, `args`, `env` |
+| Local subprocess | `command`, `args`, `env`, with `type: stdio` | `command`, `args`, `env`, `env_vars` | `command`, `args`, `env`, `cwd` |
 | Remote server | `url` with `type: http`, also `sse` and `ws` | `url` | `serverUrl`; `url` and `httpUrl` are rejected |
 | Transport selector | the `type` field | the presence of `url` versus `command` | the presence of `serverUrl` versus `command` |
+| Transports supported | stdio, http, sse, ws | stdio and http | stdio, Streamable HTTP, and SSE |
 | Porting-in notes | set `type` explicitly, and prefer `http` since `sse` is deprecated | a remote server is just a `url`, with no `type` field | rename a remote server's `url` to `serverUrl`, since `url` and `httpUrl` are refused |
 
 ---
@@ -36,7 +37,7 @@ Servers can be defined at more than one scope, and each tool gates project serve
 | Dimension | Claude Code | Codex | Antigravity |
 |---|---|---|---|
 | Scopes | local, project, and user | user, and project | global and workspace |
-| Precedence | local over project over user, and the whole entry wins | the closest file wins, and a project cannot override auth keys | combined, with same name precedence unconfirmed |
+| Precedence | local over project over user, and the whole entry wins | the closest file wins, and a project cannot override auth keys | the workspace `.agents/mcp_config.json` takes priority over the global file |
 | Trust and approval | a project `.mcp.json` server needs approval before first use | project servers load only for a trusted project | a server's tools default to Ask before running |
 | Porting-in notes | a cloned repo's servers stay pending until approved, or set `enableAllProjectMcpServers` | mark the project trusted or its MCP servers are skipped | servers connect, but their tools wait behind an Ask prompt until permitted |
 
@@ -63,7 +64,7 @@ Beyond declaring servers, each tool offers an in session command and a way to wi
 | Dimension | Claude Code | Codex | Antigravity |
 |---|---|---|---|
 | In session command | `/mcp` to view, authenticate, and reconnect | `/mcp` to view active servers | `/mcp` opens the manager overlay |
-| Enable or disable a server | `enabledMcpjsonServers` and `disabledMcpjsonServers` | `enabled` and `required` per server | enable and disable in the manager |
+| Enable or disable a server | `enabledMcpjsonServers` and `disabledMcpjsonServers` | `enabled` and `required` per server | a `disabled` boolean on the entry, or the manager overlay |
 | Tool filtering | managed allow and deny lists, plus tool deferral | `enabled_tools` allow list and `disabled_tools` deny list | a `disabledTools` deny list |
 | Managed control | `managed-mcp.json`, `allowedMcpServers`, `deniedMcpServers` | per tool approval modes | permission resources such as `mcp(server/*)` |
 | Porting-in notes | an organization can pin the whole server set through `managed-mcp.json` | filter tools per server with `enabled_tools` and `disabled_tools`, and gate them with approval modes | withhold tools with `disabledTools`, and govern execution through `mcp(...)` permission rules |
@@ -80,10 +81,11 @@ Beyond declaring servers, each tool offers an in session command and a way to wi
 
 **Codex**
 
-- Model Context Protocol: https://developers.openai.com/codex/mcp.md
-- Configuration Reference: https://developers.openai.com/codex/config-reference.md
+- Model Context Protocol: https://learn.chatgpt.com/docs/extend/mcp.md?surface=cli
+- Configuration Reference: https://learn.chatgpt.com/docs/config-file/config-reference.md
 
 **Antigravity**
 
-- Model Context Protocol: https://antigravity.google/assets/docs/antigravity-2-0/mcp.md
-- CLI Reference: https://antigravity.google/assets/docs/cli/cli-reference.md
+- MCP (CLI): https://antigravity.google/docs/cli/mcp
+- Model Context Protocol: https://antigravity.google/docs/mcp
+- CLI Reference: https://antigravity.google/docs/cli/reference
