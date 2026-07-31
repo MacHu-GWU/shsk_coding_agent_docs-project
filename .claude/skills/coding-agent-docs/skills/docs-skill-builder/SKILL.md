@@ -43,37 +43,63 @@ Hold these for the whole build; they decide the close calls.
 - **Be a polite client.** The probe is capped at ~28 requests and throttled. Do not loop it.
   Never bulk-fetch pages during a build.
 
-## Phase 1 — Recon (bounded)
+## Phase 1 — Discovery
 
-Run these together; they are independent.
+Discovery is **yours**, not the script's. Two halves, run together.
 
-1. **Probe the site.** Set the date so the record is stamped:
-   ```bash
-   DOCS_PROBE_DATE=$(date +%F) python3 ${CLAUDE_SKILL_DIR}/scripts/probe_docs_source.py \
-       <docs-url> --json /tmp/<name>-facts.json
-   ```
-   It calibrates against a bogus URL (many sites answer 200 for everything), tries `llms.txt`
-   at the path and every parent, analyzes structure and description coverage, tests six
-   plain-text content conventions against a real leaf page, and counts sitemap URLs.
+### 1a. The mechanical half — run the probe
 
-2. **WebSearch for the index**, because `llms.txt` locations are not standardized:
-   `"<product> llms.txt"`, `"<product> docs for LLMs"`. Re-run the probe with `--extra <url>`
-   for anything found outside the guessed paths. Do not skip this — guessing alone misses
-   indexes that live off the docs host.
+```bash
+python3 ${CLAUDE_SKILL_DIR}/scripts/probe_docs_source.py \
+    --domain <docs-url> --generated_at $(date +%F) --json_out /tmp/<name>-facts.json
+```
 
-3. **Check what the vendor already ships** — an official MCP server, Claude Code plugin, or
-   docs search API. If one exists, report it: it may make this skill redundant, or
-   complementary (hand-written best practices vs. authoritative live text). Let the user
-   decide; do not silently build a duplicate.
+Read `scripts/probe_docs_source.py --help` for the full flag list. What it does: walks a
+registry of **conventional, deterministic locations** — `llms.txt`, `llms-full.txt`,
+`.well-known/llms.txt` at the target path *and every parent* — then measures whatever it
+finds, tests six plain-text content conventions against a real leaf page, and counts sitemap
+URLs. It prints a report and, with `--json_out`, the same data as a JSON dataclass tree.
 
-If the probe finds no index at all, still report the sitemap and robots findings — T3 is a
-real option, and a source repo (catalog §2 step 5) may be better than either.
+**Understand exactly what this buys you.** It is a fast, careful substitute for you firing off
+twenty WebFetch calls by hand and eyeballing the results. That is all. Specifically:
+
+- It only knows the locations in its registry. **A site that publishes its index somewhere
+  unconventional will come back empty, and that is not evidence the index does not exist.**
+- It does not judge quality — it counts words in descriptions, it does not read them.
+- It does not decide. Its `conclusion` block is a deterministic reading of its own thresholds,
+  offered so you have a typed starting point. Confirm it against the catalog; override it when
+  the site is unusual, and say why.
+
+When the conclusion reports `needs_manual_discovery: true`, the mechanical half has finished
+and found nothing. **Do not report "no index available" on that basis.** Go do 1b properly.
+
+### 1b. The human half — search and reason
+
+Always do this, even when the probe found something:
+
+- **Web-search for the index.** `llms.txt` locations are not standardized: `"<product>
+  llms.txt"`, `"<product> docs for LLMs"`, and the vendor's own docs-for-AI / developer page.
+  Feed anything found back in with `--extra_index_url <url>` and re-run once.
+- **Look for an open-source docs repo.** Many vendors publish docs as markdown on GitHub. A
+  repo gives a complete file list plus raw markdown, often beating both llms.txt and sitemap.
+  Verify it tracks the published version rather than being ahead of it.
+- **Check what the vendor already ships** — an official MCP server, Claude Code plugin, or docs
+  search API. If one exists, report it: it may make this skill redundant, or complementary
+  (hand-written best practices vs. authoritative live text). Let the user decide; do not
+  silently build a duplicate.
+- **Look at the actual docs site** if the probe came up empty. How does its own search work? Is
+  there a JSON endpoint behind it? Is there a print/raw view? These are real mechanisms the
+  registry cannot guess at.
+
+If you find a convention the registry does not know, add it there — one entry in
+`REGISTRY.index_rules` or `REGISTRY.content_rules` — so the next build gets it for free.
 
 ## Phase 2 — Decide
 
 Read [references/mechanism-catalog.md](references/mechanism-catalog.md) now and apply its
-decision tables. Pick an **index tier (T0–T5)** and a **content tier (C0–C2)** from the
-measured facts, and note which alternative you rejected and why.
+decision tables. Pick an **index tier (T0–T5)** and a **content tier (C0–C2)**, using the
+probe's `conclusion` as a starting point rather than a verdict, and note which alternative you
+rejected and why.
 
 Then send the user **one** consolidated message: the key numbers, the chosen design, the
 tradeoff in a sentence, anything the vendor already ships, and any scope question. Ask via
@@ -83,9 +109,9 @@ facts are decisive and the notes cover scope, say what you are doing and build i
 
 Two calls that are easy to get wrong:
 
-- **A comfortable index that covers little.** Check `index_coverage`. Databricks' index is
-  47 KB with 98% prose descriptions and covers 4.5% of the site — it needs T4 layered on, or
-  the skill confidently misses almost everything.
+- **A comfortable index that covers little.** Check `coverage`. Databricks' index is 47 KB with
+  98% prose descriptions and covers 4.5% of the site — it needs T4 layered on, or the skill
+  confidently misses almost everything.
 - **HTML-only content.** Use WebFetch, not curl. It reduces HTML to markdown before anything
   reaches context; a raw page can be 50 KB–900 KB.
 
@@ -100,8 +126,8 @@ Follow [references/skill-template.md](references/skill-template.md) for the exac
 - Skip `scripts/` entirely at **T0**. An inline-index skill needs no code.
 - Write `references/mechanism.md` with the fact sheet, the decision and its reasoning, what
   would invalidate it, and any hand-written asset a rebuild must preserve.
-- Match this project's conventions: `VERSION` (start at `0.1.1`), `CHANGELOG.md`,
-  `README-cn.md`. Follow the existing `*-docs` skills for tone and section order.
+- Match this project's conventions: `VERSION` (start at `0.1.1`), `CHANGELOG.md`, and a
+  `README.md` / `README-cn.md` pair with English authoritative.
 - Write the `description` so it triggers: front-load the product name and the real top-level
   areas taken from the index's own section names. If the user works in Chinese, add Chinese
   trigger phrases — the index has none, so this is hand-written and must be flagged in
@@ -137,11 +163,13 @@ vocabulary-mismatch test is what catches it.
 
 ## Rules
 
+- **The probe supplements discovery; it does not perform it.** An empty probe means "search
+  harder", never "this site has no index".
 - **Never hand-write a number into a produced skill.** It comes from the fact sheet or it
   does not appear.
 - **Never commit page bodies.** Content is always fetched live; bodies change fastest.
 - **Never ship a placeholder.** No `<…>` from the template survives into output.
 - **Report what you skipped.** If a probe hit its budget, a section was excluded, or a test
   was not run, say so. Silent omission reads as coverage.
-- **One probe run per site per build.** If you need more requests, raise `--budget` once with
-  a reason — do not loop the script.
+- **One probe run per site per build.** If you need more requests, raise `--request_budget`
+  once with a reason — do not loop the script.

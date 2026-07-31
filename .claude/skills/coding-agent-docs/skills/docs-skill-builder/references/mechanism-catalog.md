@@ -54,8 +54,8 @@ the answer.
 
 | Step | What | How |
 | :--- | :--- | :--- |
-| 1 | **`llms.txt` by convention** | `probe_docs_source.py <url>` tries `/llms.txt`, `/llms-full.txt`, `/.well-known/llms.txt` at the target path *and every parent*, against a calibrated 404 |
-| 2 | **`llms.txt` by search** | its location is not standardized — WebSearch `"<product> llms.txt"`, and check the vendor's docs-for-AI / developer page. Feed anything found back in via `--extra` |
+| 1 | **`llms.txt` by convention** | `probe_docs_source.py --domain <url>` walks `REGISTRY.index_rules` — `/llms.txt`, `/llms-full.txt`, `/.well-known/llms.txt` — at the target path *and every parent*, against a calibrated 404 |
+| 2 | **`llms.txt` by search** | its location is not standardized — WebSearch `"<product> llms.txt"`, and check the vendor's docs-for-AI / developer page. Feed anything found back in via `--extra_index_url` |
 | 3 | **Vendor's own agent tooling** | an official MCP server, Claude Code plugin, or docs search API often exists. If it does, say so — it may make the skill unnecessary, or complementary |
 | 4 | **Sitemap** | `robots.txt` `Sitemap:` directives, `/sitemap.xml`, `/sitemap_index.xml`. Gives complete URL coverage but **no descriptions** |
 | 5 | **Open-source docs repo** | many vendors publish docs as markdown on GitHub. `git` metadata or the GitHub API gives a full file list plus raw markdown. Caveat: the repo may be *ahead of* the published site |
@@ -75,7 +75,13 @@ Traps the probe already handles, all observed in the wild:
 
 ## 3. Index mechanism tiers
 
-Read the probe's `bytes`, `description_prose_pct`, `section_count`, and `index_coverage`.
+Read the probe's `bytes`, `description_prose_pct`, `section_count`, and `coverage`.
+
+The probe's `conclusion` block already applies these thresholds and reports an
+`index_tier_hint` / `content_tier_hint`. Treat it as a typed starting point, not a verdict:
+it knows only what its registry covers, so confirm it here and override it — saying why — when
+the site is unusual. Its `needs_manual_discovery` flag means the conventional locations came
+up empty, which is a cue to search harder, never a finding that no index exists.
 
 | Tier | Trigger (from the fact sheet) | Design | Runtime cost |
 | :--- | :--- | :--- | :--- |
@@ -83,7 +89,7 @@ Read the probe's `bytes`, `description_prose_pct`, `section_count`, and `index_c
 | **T1 — section-routed** | 40–150 KB, ≥ 4 real sections, prose ≥ 50% | `sections` → `section <name>` → pages. `search` stays available as the escape hatch | 0.3–2k tok |
 | **T2 — search-first** | > 150 KB **or** bare-description ≥ 50% | `search <regex>` is the primary path; `section` is the fallback when search misses | ~0.2k tok per query |
 | **T3 — sitemap-derived** | no `llms.txt`, sitemap exists | Same script, `format: "sitemap"`. Entries are slugs only, so recall rests on URL wording | ~0.2k tok, weaker recall |
-| **T4 — hub-descend** | `index_coverage.verdict == hub-level` | Index routes to a landing page; the agent then follows that page's own links. Layer on top of T0–T2 | +1 page fetch |
+| **T4 — hub-descend** | `coverage.verdict == "hub-level"` | Index routes to a landing page; the agent then follows that page's own links. Layer on top of T0–T2 | +1 page fetch |
 | **T5 — pre-built manifest** | everything above failed acceptance | Scrape real descriptions once into a committed manifest. **Last resort** — see §6 | ~1–3k tok, goes stale |
 
 Worked examples, all measured:
@@ -141,8 +147,10 @@ happens outside the context; for HTML *page bodies* the opposite holds, because 
 nothing to filter — you either pay for the whole HTML or let WebFetch reduce it first.
 
 Always sanity-check the winning variant's body. A site can return `200` plain text that is a
-stub or a redirect notice; `index-md` scoring 1,191 B where `md-suffix` scored 4,991 B on the
-same Vercel page is exactly that — a smaller number that is not a better answer.
+stub or a redirect notice: on the same Vercel page, `index-md` returns 1,191 B where the
+correct `md-suffix` twin returns 4,991 B — a smaller number that is not a better answer. The
+probe therefore picks by **registry preference order**, not by size, and warns when two
+variants disagree by more than 2×. Open the winner before committing to a template.
 
 ---
 

@@ -11,13 +11,23 @@ measure it or drop the claim.
 ├── SKILL.md                       # from the template below
 ├── VERSION                        # 0.1.1
 ├── CHANGELOG.md                   # see project convention
-├── README-cn.md                   # Chinese overview, project convention
+├── README.md                      # English overview — authoritative
+├── README-cn.md                   # Chinese translation of README.md
 ├── scripts/
 │   ├── docs_query.py              # copied verbatim from assets/docs_query.py
 │   └── docs-source.json           # the site contract (below)
 └── references/
     └── mechanism.md               # measured facts + decision + invalidation triggers
 ```
+
+English is authoritative in every pair; when the two disagree, fix the translation. Add a
+`SKILL-cn.md` only if the user asks — Claude Code loads `SKILL.md`, so a translation of it is
+for human readers and is extra surface to keep in sync.
+
+**The generated `SKILL.md` must never mention that a translation exists.** It is the published
+artifact and the text that gets loaded into the agent's context; a note about translation
+conventions is noise there. The convention is documented only in the translated file, which
+also states that maintenance flows one way (edit the English, then sync the translation).
 
 Omit `scripts/` entirely for **T0** — an inline-index skill needs no code.
 
@@ -38,10 +48,15 @@ Omit `scripts/` entirely for **T0** — an inline-index skill needs no code.
 }
 ```
 
+Fill `index.url`, `content.mode`, and `content.url_template` from the probe's `conclusion`
+(`best_index_url`, `content_mode`, `content_url_template`) rather than by hand.
+
 - `format`: `llms-txt` or `sitemap`.
 - `mode`: `plain-text` (C0/C2) or `html-webfetch` (C1). With `html-webfetch`, omit
   `url_template` unless the page URL needs rewriting; `get` then tells the agent to WebFetch.
 - `url_template` placeholders: `{url}`, `{url_no_slash}`, `{path}`, `{slug}`, `{host}`.
+- `content.headers`: only when the winning variant was `accept-markdown` — copy the probe's
+  `conclusion.content_headers` (e.g. `{"Accept": "text/markdown"}`) and omit `url_template`.
 
 ## `SKILL.md`
 
