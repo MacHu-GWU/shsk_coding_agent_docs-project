@@ -2,6 +2,35 @@
 
 All notable changes to the `antigravity-docs` skill are documented here.
 
+## [0.2.3] - 2026-07-30
+
+Backfilled the files that `docs-skill-builder` 0.1.1 now requires of every produced skill. **No
+change to how the skill reads the docs** — no probe was run, the manifest was not regenerated,
+and `SKILL.md` is untouched. This was a documentation backfill only, at the owner's explicit
+instruction not to update the skill itself.
+
+- Added `references/mechanism.md` as an append-only mechanism log, with a first entry marked
+  **reconstruction** rather than measurement: it is recovered from the shipped SKILL/README/
+  CHANGELOG, and every live-site number in it is inherited from the 0.2.1/0.2.2 work rather
+  than re-verified. The next real `check` must run the probe and append a measured entry.
+- Added the translated counterparts the spec requires at every tier: `SKILL-cn.md`,
+  `references/mechanism-cn.md`, and `README.md` as the authoritative English half of the README
+  pair. `README-cn.md` gained the convention note (English is authoritative, maintenance flows
+  one way).
+- **Recorded a defect and traced it to its cause.** All 81 manifest descriptions are still
+  `Learn about <X>.` boilerplate, median 3 words — identical to the `llms.txt` fallback. Cause:
+  `build_manifest.py`'s `DESC_RE` matches `<div class="caption template-content-paragraph">`,
+  which appears **zero times** in the current page HTML; the lead paragraph is now a plain `<p>`
+  after the `<h1>`. The breadcrumb and `<h1>` scrapes are unaffected. The failure is silent —
+  `scrape_failures` only records network exceptions, so a regex matching nothing produces no
+  warning and the build reports success.
+- **This does not break the skill and does not invalidate T5.** The breadcrumb alone is a large
+  gain over `llms.txt`'s 9 coarse `###` groups: the manifest carries per-page paths like
+  `Antigravity 2.0 / Customizations / Skills`. Triage on title plus breadcrumb works. What is
+  lost is the second, independent triage signal. Left in place per the no-update instruction;
+  the fix is a one-regex change in `antigravity-docs-index-builder`, worth pairing with a loud
+  warning when a scrape silently degrades.
+
 ## [0.2.2] - 2026-07-29
 
 - Manifest refreshed: 81 pages, up from 77. Added `cli/mcp`, `ide/mcp`, `sdk/mcp`, and `cli/headless`; nothing removed. The per-surface MCP pages matter because the CLI now documents its own MCP configuration rather than deferring to the Antigravity 2.0 page.

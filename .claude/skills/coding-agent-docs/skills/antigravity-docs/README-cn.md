@@ -1,3 +1,6 @@
+> 这是 [README.md](README.md) 的中文翻译, 只供人阅读。**英文版是权威版本**, 两者不一致时以英文版为准,
+> 并把这份翻译改过来。维护是单向的: 改了英文版就回来同步这份, 反过来不成立。
+
 # Antigravity 文档索引 Skill
 
 这个 Skill 让 agent 在需要了解 Google Antigravity 时,不再依赖训练时记住的、可能已经过期的知识,而是去读官方文档的最新版本。Antigravity 是个很新的产品,IDE、CLI、SDK、skills、MCP、权限模型都在快速变化,靠记忆回答很容易出错。这个 Skill 的作用就是把「先查官方文档、再回答」这件事固化成一个稳定流程。
@@ -34,6 +37,13 @@ Codex 和 Claude Code 的文档页都有 `.md` 孪生页,所以那两个 Skill �
 - **正文就是页面本身**(manifest 每条里的 `content_url`,即 `https://antigravity.google/docs/<slug>`)。直接 WebFetch 它。
 
 所以它的流程是:**读本地 manifest → 挑页面 → WebFetch 对应的 `content_url`**。
+
+> **注意, 2026-07-30 实测:** 已交付的 manifest 里 81 条描述**全部**仍然是 `Learn about X.` 这种套话。
+> builder 用来抓描述的正则找的是一个 `template-content-paragraph` class, 而它在当前页面 HTML 里已经
+> 不存在了, 并且会静默 fallback。所以上面说的「预先抓取首段描述」是设计意图, 不是当前数据的实际状态。
+> 面包屑那部分抓取没受影响, 所以按 title 加面包屑分诊是能工作的, Skill 本身可用; 缺的是第二个分诊
+> 信号。`references/mechanism.md` 里有完整记录; 要修的话是在 `antigravity-docs-index-builder` 里改
+> 一条正则, 不在这个 Skill 里。
 
 ---
 
