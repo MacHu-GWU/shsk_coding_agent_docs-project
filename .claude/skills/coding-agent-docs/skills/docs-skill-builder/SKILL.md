@@ -6,7 +6,7 @@ description: Build (or re-verify) an `xxx-docs` Agent Skill that looks up a vend
   token. Use when asked to create a docs-lookup skill for a product ("build a databricks-docs
   skill", "make a skill for Stripe's docs"), to check whether an existing one has gone stale,
   or to work out how to query some vendor's documentation efficiently.
-argument-hint: [build|check] <target-path> for <docs URL or product> [notes]
+argument-hint: '[build|check] <target-path> for <docs URL or product> [notes]'
 allowed-tools: Bash, Read, Write, Edit, WebFetch, WebSearch
 ---
 
