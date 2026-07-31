@@ -140,7 +140,18 @@ Follow [references/skill-template.md](references/skill-template.md) for the exac
 
 ## Phase 4 — Acceptance test (not optional)
 
-Run the built skill's own commands and report real numbers. Per catalog §7:
+First, prove the skill can load at all:
+
+```bash
+python3 -c "import sys,yaml; d=yaml.safe_load(open(sys.argv[1]).read().split('---',2)[1]); print({k:type(v).__name__ for k,v in d.items()})" <target>/SKILL.md
+```
+
+Expect four `str` fields. This runs first because frontmatter that fails to parse does not
+error — the skill loads with **empty metadata** and therefore never triggers, so every test
+below would be measuring a skill the agent can no longer find. A `list` where you expected a
+`str` means an unquoted `[…]`; see the template's frontmatter section.
+
+Then run the built skill's own commands and report real numbers. Per catalog §7:
 
 1. An easy lookup whose term appears in a title.
 2. **A vocabulary-mismatch lookup** — a topic whose page title lacks the obvious search word.
@@ -180,6 +191,9 @@ not restate the mechanism — the entry below it still holds.
   does not appear.
 - **Never commit page bodies.** Content is always fetched live; bodies change fastest.
 - **Never ship a placeholder.** No `<…>` from the template survives into output.
+- **Never ship frontmatter you have not parsed.** Quote `argument-hint`; a bare `[…]` is a YAML
+  sequence, not a string. Unparseable frontmatter loads as empty metadata instead of failing, so
+  the skill goes silently untriggerable — verify it in Phase 4, do not eyeball it.
 - **Never rewrite a past `mechanism.md` entry.** Append a new one. The value of the log is that
   it shows what was believed at the time and why that changed.
 - **Never leave a translation behind.** `SKILL.md`, `README.md`, and `references/mechanism.md`

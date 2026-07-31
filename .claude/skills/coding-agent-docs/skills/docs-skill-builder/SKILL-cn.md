@@ -82,7 +82,17 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/probe_docs_source.py \
 
 ## Phase 4 —— 验收测试(不可跳过)
 
-跑产出 skill 自己的命令, 报告真实数字。按 catalog 第 7 节:
+先证明这个 skill 根本加载得起来:
+
+```bash
+python3 -c "import sys,yaml; d=yaml.safe_load(open(sys.argv[1]).read().split('---',2)[1]); print({k:type(v).__name__ for k,v in d.items()})" <target>/SKILL.md
+```
+
+应该得到四个 `str` 字段。这一步放在最前面, 是因为 frontmatter 解析失败**不会报错** —— skill 会以
+**空 metadata** 加载, 于是永远不会被触发, 那么下面每一项测试量的都是一个 agent 已经找不到的 skill。
+本该是 `str` 的地方出现 `list`, 说明 `[…]` 没加引号; 见模板里 frontmatter 那一节。
+
+然后跑产出 skill 自己的命令, 报告真实数字。按 catalog 第 7 节:
 
 1. 一个简单查询, 关键词直接出现在标题里。
 2. **一个词汇错配查询** —— 目标页面的标题里**没有**那个显而易见的搜索词。这才是关键测试; 这类 skill 就是这么失败的。
@@ -110,6 +120,7 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/probe_docs_source.py \
 - **绝不手写数字进产出的 skill。** 数字要么来自探测报告, 要么就不出现。
 - **绝不把正文提交进仓库。** 正文永远实时抓; 它变得最快。
 - **绝不留占位符。** 模板里的 `<…>` 一个都不许进入产出。
+- **绝不交付没有解析过的 frontmatter。** `argument-hint` 要加引号; 裸的 `[…]` 在 YAML 里是序列, 不是字符串。解析不了的 frontmatter 不会失败, 而是以空 metadata 加载, 于是这个 skill 就无声地变得永远触发不了 —— 在 Phase 4 里验证它, 不要靠肉眼看。
 - **绝不改写 `mechanism.md` 里已有的条目。** 追加一条新的。这个日志的价值就在于它记录了当时相信什么、以及后来为什么变了。
 - **绝不落下翻译。** `SKILL.md`、`README.md`、`references/mechanism.md` 都要连同各自的 `-cn.md` 在同一轮里更新。过期的翻译比没有翻译更糟 —— 它看起来像是最新的。
 - **说清楚你跳过了什么。** 探测撞到预算上限、某个分节被排除、某项测试没跑 —— 都要说。默默省略会被读成"已覆盖"。

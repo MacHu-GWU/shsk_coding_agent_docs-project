@@ -86,8 +86,10 @@ message; ask only what would genuinely change the build.
 copied **verbatim**; all per-site difference lives in `docs-source.json`. Forking the script
 is not allowed.
 
-**Phase 4 — Acceptance test.** Must actually run, and must include the test that exposes real
-failures: a query whose **target page title does not contain the obvious search word**. That
+**Phase 4 — Acceptance test.** Must actually run. It opens by parsing the emitted frontmatter,
+because YAML that fails to parse does not raise — the skill loads with empty metadata and simply
+never triggers, which would make every later measurement meaningless. Then the test that exposes
+real failures: a query whose **target page title does not contain the obvious search word**. That
 is how these skills fail in practice.
 
 **`check` mode.** Re-probes against the baseline in the top entry of the produced skill's

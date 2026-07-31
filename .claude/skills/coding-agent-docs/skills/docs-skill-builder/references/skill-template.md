@@ -79,6 +79,30 @@ Fill `index.url`, `content.mode`, and `content.url_template` from the probe's `c
 
 ## `SKILL.md`
 
+### The frontmatter has to parse as YAML
+
+Non-negotiable, and easy to get wrong: a value beginning with `[` is a YAML **flow sequence**,
+not a string. `argument-hint: [topic]` happens to survive as a one-element list, but the moment
+the brackets are followed by anything else the document stops parsing:
+
+```yaml
+argument-hint: [build|check] <path> [notes]    # ✗ sequence closes, then a stray scalar
+argument-hint: '[build|check] <path> [notes]'  # ✓
+```
+
+**So always single-quote `argument-hint`.** The same applies to any value containing `: `, or
+starting with `{`, `&`, `*`, `!`, `|`, `>`, `%`, or `@`.
+
+This failure is worth more than one line of caution because of how it presents: the parse error
+points at line 2 (`name:`), nowhere near the offending line, and a skill whose frontmatter fails
+to parse **loads with empty metadata rather than erroring** — no name, no description, so it
+simply never triggers, silently. Before shipping, parse it and confirm you get four string
+fields:
+
+```bash
+python3 -c "import sys,yaml; d=yaml.safe_load(open(sys.argv[1]).read().split('---',2)[1]); print({k:type(v).__name__ for k,v in d.items()})" <target>/SKILL.md
+```
+
 ````markdown
 ---
 name: <product>-docs
@@ -87,7 +111,7 @@ description: Look up authoritative, up-to-date <Product> documentation covering 
   <Product> feature works, what a config field does, how to set up <top areas>, when
   troubleshooting a <Product> error, or when you need current official docs rather than
   training-cutoff knowledge.
-argument-hint: [topic]
+argument-hint: '[topic]'
 allowed-tools: <Bash(python3 *) and/or WebFetch — only what the tier actually uses>
 ---
 

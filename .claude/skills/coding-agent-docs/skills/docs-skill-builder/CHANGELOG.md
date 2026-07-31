@@ -2,6 +2,28 @@
 
 All notable changes to the `docs-skill-builder` skill are documented here.
 
+## [0.1.2] - 2026-07-31
+
+Fixes this skill's own frontmatter and hardens the output spec against the same defect.
+
+- **Fixed `argument-hint` in `SKILL.md`.** It read
+  `argument-hint: [build|check] <target-path> for <docs URL or product> [notes]`. In YAML a value
+  beginning with `[` is a flow sequence, so it closed after `[build|check]` and the trailing text
+  became an unanchored scalar — the whole document failed to parse, and plugin validation refused
+  to tag the release. Now single-quoted. Every `SKILL.md` in the repo was re-parsed to confirm
+  this was the only one broken; 18 others use an unquoted `[phrase]`, which is benign because a
+  bare bracketed phrase is a valid one-element sequence.
+- **Template now specifies quoting and explains why.** `references/skill-template.md` gained a
+  frontmatter section, and its example uses `argument-hint: '[topic]'`. The rule extends to any
+  value containing `: ` or starting with `{`, `&`, `*`, `!`, `|`, `>`, `%`, or `@`.
+- **Phase 4 now opens by parsing the emitted frontmatter**, before any lookup test. This is the
+  real hardening: the failure does not raise. A skill whose frontmatter fails to parse loads with
+  **empty metadata** — no name, no description — so it never triggers, and every acceptance test
+  after it would be measuring a skill the agent can no longer find. The parse error also points
+  at line 2 rather than the offending line, so eyeballing it is not reliable.
+- Added a matching rule: never ship frontmatter you have not parsed. `SKILL-cn.md`, `README.md`,
+  and `README-cn.md` updated in the same pass.
+
 ## [0.1.1] - 2026-07-30
 
 - Initial release. Builds (and re-verifies) `xxx-docs` lazy-loading documentation skills from
