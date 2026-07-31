@@ -64,14 +64,12 @@ makes "match on title + description" work at all.
 
 So the flow is: **read the local manifest → pick pages → WebFetch their `content_url`**.
 
-> **Caveat, measured 2026-07-30:** all 81 descriptions in the shipped manifest are still
-> `Learn about X.` boilerplate. The builder's description regex looks for a
-> `template-content-paragraph` class that no longer exists in the page HTML, and it falls back
-> silently, so the lead-paragraph scrape described above is what the design calls for rather
-> than what the current data contains. The breadcrumb scrape is unaffected, so triage on title
-> plus breadcrumb works and the skill is functional; what is missing is the second triage
-> signal. `references/mechanism.md` records this in full; the fix is one regex in
-> `antigravity-docs-index-builder`, not here.
+> **History worth knowing:** between 2026-07-25 and 2026-07-30 this was true in design only. The
+> builder's description regex looked for a class that no longer existed in the page HTML and fell
+> back silently, so all 81 descriptions were `Learn about X.` boilerplate and triage ran on title
+> plus breadcrumb alone. Fixed in `antigravity-docs-index-builder` 0.2.2 and regenerated on
+> 2026-07-31: coverage is now 81/81 with 0 boilerplate descriptions. `references/mechanism.md`
+> has the measured before/after.
 
 ---
 

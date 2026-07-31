@@ -3,6 +3,38 @@
 How this skill reads Google Antigravity's documentation, and why. Newest entry first; the top
 entry describes the current mechanism. Entries are appended, never rewritten.
 
+## 2026-07-31 — build
+
+**Verdict.** The defect recorded below is fixed. The mechanism is unchanged — still T5 against a
+local manifest, still C1 content — but the manifest's description column now carries real text
+for the first time, so triage has two working signals instead of one.
+
+**What moved.** `antigravity-docs-index-builder` 0.2.2 replaced the dead
+`template-content-paragraph` selector with the first substantial `<p>` after the body's `<h1>`,
+and added a `Scrape coverage` report so a selector that stops matching can no longer degrade the
+manifest silently. Manifest regenerated with `--force`: 81 pages (no pages added or removed),
+21,934 B → 33,005 B, coverage **81/81 on section, title, and description**, no warning.
+Boilerplate descriptions went from 81/81 to **0/81**; description length from a median of 3
+words (max 6) to a median of 21 (max 48). Raw HTML entities in titles and breadcrumbs are also
+gone — `clean()` now unescapes and no longer welds words together across stripped tags.
+
+**Acceptance tests, run against the old and new manifests side by side.** Easy lookup `hooks?`:
+2 → 5 entries. The vocabulary-mismatch cases are where the fix shows, since these are words that
+appear in no title and no breadcrumb: `isolation` 0 → 1 (`cli/sandbox`), `parallel` 0 → 2
+(`subagents`, `cli/subagents`), `open standard` 0 → 6 (`mcp`, `skills`, `cli/mcp`, `sdk/mcp`, …).
+Two honest negatives: `12,000` (a limit stated in the body of `rules-workflows`) matches nothing
+in either manifest — the index carries lead paragraphs, not full text, and that is by design; and
+the non-English query `钩子` matches nothing in either, which is expected for an English index but
+matters more here than it looks — see below.
+
+**Newly visible gap, not fixed.** `SKILL.md` has no recall-escalation ladder: step 2 goes
+straight from "nothing in the manifest obviously matches" to "say so". There is no instruction to
+widen with synonyms, and none to translate a non-English query into English first. The `钩子` → 0
+result above is exactly the silent failure that ladder exists to prevent, and the sibling
+`claude-code-docs` grew one in its 0.2.0 for the same measured reason. Left alone here because
+this pass was scoped to the manifest; it is the strongest remaining improvement available to this
+skill.
+
 ## 2026-07-30 — reconstruction
 
 **Verdict.** This entry is a **reconstruction, not a measurement.** The skill predates the

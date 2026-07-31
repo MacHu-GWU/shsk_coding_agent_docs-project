@@ -38,12 +38,10 @@ Codex 和 Claude Code 的文档页都有 `.md` 孪生页,所以那两个 Skill �
 
 所以它的流程是:**读本地 manifest → 挑页面 → WebFetch 对应的 `content_url`**。
 
-> **注意, 2026-07-30 实测:** 已交付的 manifest 里 81 条描述**全部**仍然是 `Learn about X.` 这种套话。
-> builder 用来抓描述的正则找的是一个 `template-content-paragraph` class, 而它在当前页面 HTML 里已经
-> 不存在了, 并且会静默 fallback。所以上面说的「预先抓取首段描述」是设计意图, 不是当前数据的实际状态。
-> 面包屑那部分抓取没受影响, 所以按 title 加面包屑分诊是能工作的, Skill 本身可用; 缺的是第二个分诊
-> 信号。`references/mechanism.md` 里有完整记录; 要修的话是在 `antigravity-docs-index-builder` 里改
-> 一条正则, 不在这个 Skill 里。
+> **一段值得知道的历史:** 2026-07-25 到 07-30 之间, 上面这段只在设计上成立。builder 抓描述的正则找的
+> 是一个在页面 HTML 里已经不存在的 class, 而且会静默 fallback, 所以 81 条描述全是 `Learn about X.`
+> 套话, 实际分诊只靠 title 加面包屑。已在 `antigravity-docs-index-builder` 0.2.2 修复, 并于
+> 2026-07-31 重新生成: 现在覆盖率 81/81, 套话描述 0 条。`references/mechanism.md` 里有实测的前后对比。
 
 ---
 

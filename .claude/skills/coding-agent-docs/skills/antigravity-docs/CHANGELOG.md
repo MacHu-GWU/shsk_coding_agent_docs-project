@@ -2,6 +2,28 @@
 
 All notable changes to the `antigravity-docs` skill are documented here.
 
+## [0.2.4] - 2026-07-31
+
+Manifest regenerated against `antigravity-docs-index-builder` 0.2.2, which fixed the dead
+description selector recorded in 0.2.3. No change to the mechanism — still a local manifest read
+with the page itself as content.
+
+- **Descriptions are real for the first time.** Boilerplate went from 81/81 to **0/81**; median
+  description length from 3 words to 21 (max 48). Manifest 21,934 B → 33,005 B. Scrape coverage
+  81/81 on section, title, and description, with no stale-selector warning. 81 pages, none added
+  or removed.
+- Raw HTML entities are gone from titles and breadcrumbs ("Background tasks &amp; subagents" →
+  "&"), and words are no longer welded together where a tag was stripped.
+- **Measured what this bought**, old manifest vs new, on queries whose words appear in no title
+  and no breadcrumb: `isolation` 0 → 1 (`cli/sandbox`), `parallel` 0 → 2 (`subagents`,
+  `cli/subagents`), `open standard` 0 → 6. The easy case `hooks?` went 2 → 5. Two honest
+  negatives: `12,000` (a limit stated in a page body) matches nothing in either — the index
+  carries lead paragraphs, not full text — and the non-English `钩子` matches nothing in either.
+- **Known gap, not addressed:** `SKILL.md` still has no recall-escalation ladder — no
+  synonym-widening step and no translate-first rule — so a non-English or vocabulary-mismatched
+  query can still produce a confident "not in the docs". Recorded in `references/mechanism.md`
+  as the strongest remaining improvement.
+
 ## [0.2.3] - 2026-07-30
 
 Backfilled the files that `docs-skill-builder` 0.1.1 now requires of every produced skill. **No
