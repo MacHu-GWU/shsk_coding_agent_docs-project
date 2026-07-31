@@ -1,0 +1,147 @@
+---
+name: docs-skill-builder
+description: Build (or re-verify) an `xxx-docs` Agent Skill that looks up a vendor's official
+  documentation on demand — by probing the site for an llms.txt/sitemap/source-repo index and
+  a plain-text content contract, then picking the lazy-load design that maximizes recall per
+  token. Use when asked to create a docs-lookup skill for a product ("build a databricks-docs
+  skill", "make a skill for Stripe's docs"), to check whether an existing one has gone stale,
+  or to work out how to query some vendor's documentation efficiently.
+argument-hint: [build|check] <target-path> for <docs URL or product> [notes]
+allowed-tools: Bash, Read, Write, Edit, WebFetch, WebSearch
+---
+
+# Docs Skill Builder
+
+Produces an `xxx-docs` skill: a lazy loader that answers questions from a vendor's live
+documentation. Invocation:
+
+```
+/docs-skill-builder build .claude/skills/databricks-docs for https://docs.databricks.com
+/docs-skill-builder check  .claude/skills/databricks-docs
+```
+
+Parse `$ARGUMENTS` into **mode** (`build`, default, or `check`), **target path**, **subject**
+(a URL or product name), and any **notes**. Notes are requirements, not suggestions — honor
+them or say plainly why you did not.
+
+The whole job is one question: **what is the cheapest way to find the right page, and the
+cheapest way to read it?** Everything else follows from measurements.
+
+## Standing principles
+
+Hold these for the whole build; they decide the close calls.
+
+- **Measure, don't assume.** Every number in the produced skill comes from the probe. If you
+  cannot measure it, do not claim it.
+- **Describe the contract; don't materialize the list.** Prefer a rule ("append `.md`") over a
+  committed inventory. A copied page list is a second source of truth that only decays.
+- **Use the site's own hierarchy.** Its sections and landing pages are maintained upstream and
+  are always current. An invented taxonomy is a liability.
+- **Buy recall with reasoning, not artifacts.** Query expansion and section fallback at query
+  time beat a pre-enriched index that goes stale.
+- **Crawling is the last resort**, and needs the explicit justification in catalog §6.
+- **Be a polite client.** The probe is capped at ~28 requests and throttled. Do not loop it.
+  Never bulk-fetch pages during a build.
+
+## Phase 1 — Recon (bounded)
+
+Run these together; they are independent.
+
+1. **Probe the site.** Set the date so the record is stamped:
+   ```bash
+   DOCS_PROBE_DATE=$(date +%F) python3 ${CLAUDE_SKILL_DIR}/scripts/probe_docs_source.py \
+       <docs-url> --json /tmp/<name>-facts.json
+   ```
+   It calibrates against a bogus URL (many sites answer 200 for everything), tries `llms.txt`
+   at the path and every parent, analyzes structure and description coverage, tests six
+   plain-text content conventions against a real leaf page, and counts sitemap URLs.
+
+2. **WebSearch for the index**, because `llms.txt` locations are not standardized:
+   `"<product> llms.txt"`, `"<product> docs for LLMs"`. Re-run the probe with `--extra <url>`
+   for anything found outside the guessed paths. Do not skip this — guessing alone misses
+   indexes that live off the docs host.
+
+3. **Check what the vendor already ships** — an official MCP server, Claude Code plugin, or
+   docs search API. If one exists, report it: it may make this skill redundant, or
+   complementary (hand-written best practices vs. authoritative live text). Let the user
+   decide; do not silently build a duplicate.
+
+If the probe finds no index at all, still report the sitemap and robots findings — T3 is a
+real option, and a source repo (catalog §2 step 5) may be better than either.
+
+## Phase 2 — Decide
+
+Read [references/mechanism-catalog.md](references/mechanism-catalog.md) now and apply its
+decision tables. Pick an **index tier (T0–T5)** and a **content tier (C0–C2)** from the
+measured facts, and note which alternative you rejected and why.
+
+Then send the user **one** consolidated message: the key numbers, the chosen design, the
+tradeoff in a sentence, anything the vendor already ships, and any scope question. Ask via
+AskUserQuestion only if the answer would genuinely change the build — for example two tiers
+within measuring error, or whether to include a heavyweight API-reference section. If the
+facts are decisive and the notes cover scope, say what you are doing and build it.
+
+Two calls that are easy to get wrong:
+
+- **A comfortable index that covers little.** Check `index_coverage`. Databricks' index is
+  47 KB with 98% prose descriptions and covers 4.5% of the site — it needs T4 layered on, or
+  the skill confidently misses almost everything.
+- **HTML-only content.** Use WebFetch, not curl. It reduces HTML to markdown before anything
+  reaches context; a raw page can be 50 KB–900 KB.
+
+## Phase 3 — Emit
+
+Follow [references/skill-template.md](references/skill-template.md) for the exact file set,
+`docs-source.json` schema, and SKILL.md structure. Also:
+
+- Copy `assets/docs_query.py` **verbatim** into `<target>/scripts/`. Do not fork it — per-site
+  behavior belongs in `docs-source.json`. If a site genuinely cannot be expressed in that
+  config, prefer extending the config schema over writing a bespoke script, and say so.
+- Skip `scripts/` entirely at **T0**. An inline-index skill needs no code.
+- Write `references/mechanism.md` with the fact sheet, the decision and its reasoning, what
+  would invalidate it, and any hand-written asset a rebuild must preserve.
+- Match this project's conventions: `VERSION` (start at `0.1.1`), `CHANGELOG.md`,
+  `README-cn.md`. Follow the existing `*-docs` skills for tone and section order.
+- Write the `description` so it triggers: front-load the product name and the real top-level
+  areas taken from the index's own section names. If the user works in Chinese, add Chinese
+  trigger phrases — the index has none, so this is hand-written and must be flagged in
+  `mechanism.md` as rebuild-preserved.
+
+## Phase 4 — Acceptance test (not optional)
+
+Run the built skill's own commands and report real numbers. Per catalog §7:
+
+1. An easy lookup whose term appears in a title.
+2. **A vocabulary-mismatch lookup** — a topic whose page title lacks the obvious search word.
+   This is the test that matters; it is how these skills actually fail.
+3. A non-English query, to confirm the translate-first rule is written down and works.
+4. One content fetch, reporting measured bytes.
+
+If test 2 only passes by loading the whole index, the tier is wrong — go back to Phase 2.
+Report the measured costs. Do not claim a pass you did not run.
+
+## `check` mode
+
+For an existing skill at `<target-path>`: read its `references/mechanism.md`, re-run the probe
+against the recorded index URL, and diff the facts against the record. Report:
+
+- **Index moved or died** (redirect, 404, auth wall) → the skill is broken; rebuild.
+- **Structure drifted** (sections renamed, size changed sharply, description coverage moved
+  across a tier threshold) → the tier may no longer be right; say which way it moved.
+- **Content contract changed** (`.md` twins appeared or vanished) → often a large token win or
+  loss; C1→C0 is worth rebuilding for on its own.
+- **Nothing changed** → say so plainly and stop. A no-op is a good result.
+
+Re-run the Phase 4 tests either way — a skill can rot without any fact changing, and the
+vocabulary-mismatch test is what catches it.
+
+## Rules
+
+- **Never hand-write a number into a produced skill.** It comes from the fact sheet or it
+  does not appear.
+- **Never commit page bodies.** Content is always fetched live; bodies change fastest.
+- **Never ship a placeholder.** No `<…>` from the template survives into output.
+- **Report what you skipped.** If a probe hit its budget, a section was excluded, or a test
+  was not run, say so. Silent omission reads as coverage.
+- **One probe run per site per build.** If you need more requests, raise `--budget` once with
+  a reason — do not loop the script.
