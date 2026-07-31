@@ -124,10 +124,15 @@ Follow [references/skill-template.md](references/skill-template.md) for the exac
   behavior belongs in `docs-source.json`. If a site genuinely cannot be expressed in that
   config, prefer extending the config schema over writing a bespoke script, and say so.
 - Skip `scripts/` entirely at **T0**. An inline-index skill needs no code.
-- Write `references/mechanism.md` with the fact sheet, the decision and its reasoning, what
-  would invalidate it, and any hand-written asset a rebuild must preserve.
-- Match this project's conventions: `VERSION` (start at `0.1.1`), `CHANGELOG.md`, and a
-  `README.md` / `README-cn.md` pair with English authoritative.
+- Open `references/mechanism.md` with the first log entry: how the site is read, why this
+  design and which alternative lost, what would overturn it, and any hand-written asset a
+  rebuild must preserve. It is append-only from here — see the template for the entry format
+  and its word budget.
+- Match this project's conventions: `VERSION` (start at `0.1.1`) and `CHANGELOG.md`.
+- **Ship all three translated pairs**: `SKILL.md`, `README.md`, and `references/mechanism.md`
+  each get a `-cn.md` counterpart, written in the same pass, English authoritative. The
+  English files never mention that a translation exists; only the `-cn.md` files carry the
+  convention. This is required at every tier.
 - Write the `description` so it triggers: front-load the product name and the real top-level
   areas taken from the index's own section names. If the user works in Chinese, add Chinese
   trigger phrases — the index has none, so this is hand-written and must be flagged in
@@ -148,18 +153,24 @@ Report the measured costs. Do not claim a pass you did not run.
 
 ## `check` mode
 
-For an existing skill at `<target-path>`: read its `references/mechanism.md`, re-run the probe
-against the recorded index URL, and diff the facts against the record. Report:
+For an existing skill at `<target-path>`: read the top entry of its `references/mechanism.md`,
+re-run the probe against the recorded index URL, and diff the facts against that baseline.
+Report:
 
 - **Index moved or died** (redirect, 404, auth wall) → the skill is broken; rebuild.
 - **Structure drifted** (sections renamed, size changed sharply, description coverage moved
   across a tier threshold) → the tier may no longer be right; say which way it moved.
 - **Content contract changed** (`.md` twins appeared or vanished) → often a large token win or
   loss; C1→C0 is worth rebuilding for on its own.
-- **Nothing changed** → say so plainly and stop. A no-op is a good result.
+- **Nothing changed** → say so plainly. A no-op is a good result.
 
 Re-run the Phase 4 tests either way — a skill can rot without any fact changing, and the
 vocabulary-mismatch test is what catches it.
+
+Then **append one entry to `references/mechanism.md`** (and its translation) recording what
+this check found, including when the answer was "nothing". A check that leaves no trace is
+indistinguishable from a check that never ran. Keep a no-change entry under 200 words and do
+not restate the mechanism — the entry below it still holds.
 
 ## Rules
 
@@ -169,6 +180,11 @@ vocabulary-mismatch test is what catches it.
   does not appear.
 - **Never commit page bodies.** Content is always fetched live; bodies change fastest.
 - **Never ship a placeholder.** No `<…>` from the template survives into output.
+- **Never rewrite a past `mechanism.md` entry.** Append a new one. The value of the log is that
+  it shows what was believed at the time and why that changed.
+- **Never leave a translation behind.** `SKILL.md`, `README.md`, and `references/mechanism.md`
+  ship with their `-cn.md` counterparts, updated in the same pass. A stale translation is
+  worse than a missing one — it reads as current.
 - **Report what you skipped.** If a probe hit its budget, a section was excluded, or a test
   was not run, say so. Silent omission reads as coverage.
 - **One probe run per site per build.** If you need more requests, raise `--request_budget`

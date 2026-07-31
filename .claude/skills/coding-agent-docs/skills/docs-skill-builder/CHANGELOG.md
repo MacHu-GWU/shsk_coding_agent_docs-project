@@ -70,3 +70,10 @@ so the spec lives in data and not in forked code.
   text loaded into the agent's context, so the convention lives only in `SKILL-cn.md`, which
   also records that maintenance flows one way. `references/skill-template.md` imposes the same
   rule on generated skills.
+- Produced skills ship three translated pairs, all required: `SKILL.md`, `README.md`, and
+  `references/mechanism.md`, each with a `-cn.md` counterpart written in the same pass.
+- `references/mechanism.md` is an append-only log rather than a static record — newest entry
+  on top, one entry per `build` and per `check` (including no-change checks), past entries
+  never rewritten. Entry length is budgeted by how much moved (≤1000 / ≤500 / ≤200 words) so
+  the file stays readable after many iterations, and a no-change entry is forbidden from
+  restating the mechanism.

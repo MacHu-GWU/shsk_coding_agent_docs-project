@@ -8,7 +8,8 @@ measure it or drop the claim.
 
 ```
 <target-path>/
-├── SKILL.md                       # from the template below
+├── SKILL.md                       # from the template below — authoritative
+├── SKILL-cn.md                    # Chinese translation of SKILL.md
 ├── VERSION                        # 0.1.1
 ├── CHANGELOG.md                   # see project convention
 ├── README.md                      # English overview — authoritative
@@ -17,19 +18,37 @@ measure it or drop the claim.
 │   ├── docs_query.py              # copied verbatim from assets/docs_query.py
 │   └── docs-source.json           # the site contract (below)
 └── references/
-    └── mechanism.md               # measured facts + decision + invalidation triggers
+    ├── mechanism.md               # append-only mechanism log — authoritative
+    └── mechanism-cn.md            # Chinese translation of mechanism.md
 ```
 
-English is authoritative in every pair; when the two disagree, fix the translation. Add a
-`SKILL-cn.md` only if the user asks — Claude Code loads `SKILL.md`, so a translation of it is
-for human readers and is extra surface to keep in sync.
+### The three translated pairs
 
-**The generated `SKILL.md` must never mention that a translation exists.** It is the published
-artifact and the text that gets loaded into the agent's context; a note about translation
-conventions is noise there. The convention is documented only in the translated file, which
-also states that maintenance flows one way (edit the English, then sync the translation).
+`SKILL.md`, `README.md`, and `references/mechanism.md` each ship with a `-cn.md` counterpart.
+All three pairs are **required**, not optional — the builder itself is bilingual and what it
+produces is too.
 
-Omit `scripts/` entirely for **T0** — an inline-index skill needs no code.
+The rules are the same for every pair:
+
+- **English is authoritative.** When the two disagree, the English wins and the translation
+  gets corrected — never the reverse.
+- **Update both in the same pass.** A translation that lags is worse than none, because it
+  reads as current. Any `build` or `check` that touches an English file touches its
+  translation before finishing.
+- **The English file never mentions that a translation exists.** `SKILL.md` in particular is
+  the published artifact and the text loaded into the agent's context; a note about
+  translation conventions is pure noise there. The convention is documented only in the
+  `-cn.md` file, which also states that maintenance flows one way.
+
+Each `-cn.md` opens with a note in that spirit:
+
+```markdown
+> 这是 [SKILL.md](SKILL.md) 的中文翻译, 只供人阅读。**英文版是权威版本**, 两者不一致时以英文版为准,
+> 并把这份翻译改过来。维护是单向的: 改了英文版就回来同步这份, 反过来不成立。
+```
+
+Omit `scripts/` entirely for **T0** — an inline-index skill needs no code. The document set
+above is required at every tier.
 
 ## `docs-source.json`
 
@@ -187,28 +206,74 @@ load several.
 
 ## `references/mechanism.md`
 
-Records what was measured and what would invalidate it, so `check` can re-verify and a
-future rebuild can re-decide rather than copy:
+An **append-only log**, changelog-style: newest entry on top, older entries never edited.
+Every `build` and every `check` appends exactly one entry. The top entry always describes the
+mechanism as it currently stands, so a reader stops after one entry unless they want history.
+
+This is what lets `check` re-verify against a recorded baseline and a future rebuild
+**re-decide rather than copy** — the reasoning is on the record, not just the conclusion.
+
+### Length budget
+
+The hard constraint is that this file stays readable after ten entries. Size the entry to how
+much actually moved:
+
+| What happened | Budget |
+| :--- | :--- |
+| Mechanism changed — tier moved, index relocated, content contract flipped | **≤ 1000 words** |
+| Numbers drifted, a section renamed, a new gotcha found | **≤ 500 words** |
+| Re-verified and nothing changed | **≤ 200 words** |
+
+Write in prose, not bare bullets — someone six months out has to understand *why* the design
+is what it is, and a bullet list does not carry reasoning. But stay well under the budget when
+the content allows; these are ceilings, not targets.
+
+**A no-change entry must not restate the mechanism.** Say it is unchanged, give the numbers
+re-measured and the tests re-run, and stop. The entry below it still holds; repeating it is
+what makes these files unreadable.
+
+### File header
 
 ```markdown
-# <product>-docs — mechanism record
+# <product>-docs — mechanism log
 
-Measured <YYYY-MM-DD> by `docs-skill-builder` <version>.
-
-## Fact sheet
-<paste the probe's human-readable output>
-
-## Decision
-Index tier **<T?>** because <the specific numbers that triggered it>.
-Content tier **<C?>** because <same>.
-Rejected: <tier> — <why, in one line>.
-
-## What would change this decision
-- <e.g. "site starts publishing per-section llms.txt → move to T1 and drop the script">
-- <e.g. "prose descriptions rise above 50% → T2 becomes T1">
-- <e.g. "`.md` twins appear → C1 becomes C0, big token win">
-
-## Hand-written assets that a rebuild must preserve
-- <e.g. the Chinese trigger phrases in `description` — absent from the English index and
-  not reproducible by any script>
+How this skill reads <Product>'s documentation, and why. Newest entry first; the top entry
+describes the current mechanism. Entries are appended, never rewritten.
 ```
+
+### Entry format — a build, or a check that found change
+
+````markdown
+## <YYYY-MM-DD> — <build | check> · docs-skill-builder <version>
+
+**Verdict.** <One line: what this entry establishes or what moved since the last one.>
+
+**How the site is read.** <The index: URL, what kind, measured size, entry count, description
+coverage, coverage vs. the sitemap. How the skill queries it — which command, what enters
+context. How a page body is fetched and how big one is. Enough that the design could be
+rebuilt from this paragraph alone.>
+
+**Why this design.** Index tier **<T?>**, content tier **<C?>**. <The specific measurements
+that forced the choice — not the rule, the numbers. Then the alternative considered and one
+line on why it lost.>
+
+**What would overturn it.** <Concrete, checkable triggers, each naming the tier it would move
+to: e.g. "per-section llms.txt appears → T1, drop the script"; "prose descriptions pass 50%
+→ T2 collapses to T1"; "`.md` twins appear → C1 to C0, large token win".>
+
+**Rebuild must preserve.** <Hand-written assets no script can regenerate — e.g. Chinese
+trigger phrases in `description`, absent from an English-only index.>
+````
+
+### Entry format — a check that found nothing
+
+````markdown
+## <YYYY-MM-DD> — check · docs-skill-builder <version>
+
+**Verdict.** No change. The mechanism described in the <date> entry still holds.
+
+Re-probed <index URL>: <size> B (was <size>), <n> entries (was <n>), <s> sections, <p>% with
+descriptions — all within noise. Content contract unchanged: <the rule> still returns
+<content-type>. Acceptance tests re-run, including the vocabulary-mismatch case
+(<query> → <page>); <result>.
+````

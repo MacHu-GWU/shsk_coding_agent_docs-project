@@ -55,7 +55,7 @@
 
 **Phase 4 验收** —— 必须实跑, 而且必须包含那个**真正会暴露问题的用例**: 一个"目标页面标题里根本没有那个搜索词"的查询。这才是这类 Skill 的实际失败方式。
 
-**`check` 模式** —— 拿产出 Skill 里 `references/mechanism.md` 记的事实重新探测做 diff: 索引搬家了、结构漂移跨过了档位阈值、`.md` 孪生页出现或消失(这条经常意味着一大笔 token 的得失)。没变化就直说没变化然后停。
+**`check` 模式** —— 拿产出 Skill 里 `references/mechanism.md` **最顶上那条**当基线重新探测做 diff: 索引搬家了、结构漂移跨过了档位阈值、`.md` 孪生页出现或消失(这条经常意味着一大笔 token 的得失)。无论结果如何都要追加一条新日志 —— 包括结论是"什么都没变"的时候, 因为一次不留痕迹的 check 和一次根本没跑过的 check 是分不出来的。
 
 ---
 
@@ -117,7 +117,25 @@ docs-skill-builder/
     └── skill-template.md             产出 Skill 的文件清单、配置 schema、SKILL.md 骨架
 ```
 
-产出的 Skill 里会带一份 `references/mechanism.md`, 记录**当时实测的事实、选型理由、以及什么情况下该推翻这个选型**。这样 `check` 才有得比, 下次重建也能重新判断, 而不是照抄。
+### 产出的 Skill 长什么样
+
+```
+<product>-docs/
+├── SKILL.md                          怎么查这个产品的文档(权威版)
+├── SKILL-cn.md                       中文翻译
+├── README.md / README-cn.md          概览及其翻译
+├── VERSION / CHANGELOG.md
+├── scripts/                          T0 档完全不生成
+│   ├── docs_query.py                 原样复制 —— 绝不 fork
+│   └── docs-source.json              站点差异全在这一个文件里
+└── references/
+    ├── mechanism.md                  只追加的机制日志(权威版)
+    └── mechanism-cn.md               中文翻译
+```
+
+`references/mechanism.md` 是一份 **changelog 形式的日志, 最新的在最上面**。每次 `build` 和每次 `check` 都追加一条, 记录当时实测的事实、选型理由、以及什么情况下该推翻这个选型 —— 这样 `check` 才有基线可比, 下次重建也能重新判断而不是照抄。条目长度按"实际变了多少"来定: 机制变了 ≤1000 词, 只是漂移 ≤500 词, 什么都没变 ≤200 词 —— 这是为了让这个文件迭代十次之后仍然读得下去。已有的条目永远不改写; 这份日志的价值就在于它记录了当时相信什么、以及后来为什么不成立了。
+
+**三对文件要翻译**, 而且一个都不能少: `SKILL.md`、`README.md`、`references/mechanism.md`。英文为准, 两边在同一轮里一起写完, 而且英文版里绝不提翻译的存在 —— 那条约定只写在 `-cn.md` 里。Builder 自己是中英双语的, 它产出的东西也应该是。
 
 ---
 

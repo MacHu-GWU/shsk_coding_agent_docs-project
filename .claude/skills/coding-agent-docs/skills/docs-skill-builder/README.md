@@ -90,10 +90,11 @@ is not allowed.
 failures: a query whose **target page title does not contain the obvious search word**. That
 is how these skills fail in practice.
 
-**`check` mode.** Re-probes against the facts recorded in the produced skill's
-`references/mechanism.md` and diffs them: index moved, structure drifted across a tier
-threshold, `.md` twins appeared or vanished (often a large token swing). If nothing changed,
-it says so and stops.
+**`check` mode.** Re-probes against the baseline in the top entry of the produced skill's
+`references/mechanism.md` and diffs it: index moved, structure drifted across a tier
+threshold, `.md` twins appeared or vanished (often a large token swing). Either way it appends
+a new log entry — including when the finding is "nothing changed", since a check that leaves
+no trace is indistinguishable from one that never ran.
 
 ---
 
@@ -183,9 +184,34 @@ docs-skill-builder/
     └── skill-template.md             produced-skill file set, config schema, SKILL.md skeleton
 ```
 
-Each produced skill carries a `references/mechanism.md` recording **the facts measured at the
-time, the reasoning behind the choice, and what would overturn it** — so `check` has something
-to diff against, and a future rebuild can re-decide rather than copy.
+### What a produced skill looks like
+
+```
+<product>-docs/
+├── SKILL.md                          how to query this product's docs (authoritative)
+├── SKILL-cn.md                       Chinese translation
+├── README.md / README-cn.md          overview and its translation
+├── VERSION / CHANGELOG.md
+├── scripts/                          omitted entirely at T0
+│   ├── docs_query.py                 copied verbatim — never forked
+│   └── docs-source.json              the whole per-site difference
+└── references/
+    ├── mechanism.md                  append-only mechanism log (authoritative)
+    └── mechanism-cn.md               Chinese translation
+```
+
+`references/mechanism.md` is a **changelog-style log, newest entry on top**. Every `build` and
+every `check` appends one entry recording the facts measured at the time, the reasoning behind
+the choice, and what would overturn it — so `check` has a baseline to diff against, and a
+future rebuild can re-decide rather than copy. Entry length is budgeted by how much actually
+moved: ≤1000 words when the mechanism changed, ≤500 for drift, ≤200 for "nothing changed" —
+which keeps the file readable after ten entries. Past entries are never rewritten; the log's
+value is that it shows what was believed then and why it stopped being true.
+
+**Three pairs are translated**, and all three are required: `SKILL.md`, `README.md`, and
+`references/mechanism.md`. English is authoritative, both halves are written in the same pass,
+and the English file never mentions the translation — that convention lives only in the
+`-cn.md` file. The builder is bilingual, and so is what it produces.
 
 ---
 
