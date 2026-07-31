@@ -18,7 +18,12 @@ are gone (404). So v2 does this instead:
   2. Each page is fetched directly and scraped for three things pulled out of
      server-rendered HTML: the breadcrumb trail (`docs-main-content` nav —
      richer than llms.txt's flat section), the `<h1>` title, and the first
-     lead paragraph (`template-content-paragraph`) as a real description.
+     substantial `<p>` after that `<h1>` as a real description.
+
+     Each of those is a selector against markup this project does not control,
+     so each can go stale silently. `report_fallbacks()` exists to make that
+     loud: a field that falls back on most pages is reported as a stale
+     selector, not buried in a successful-looking build.
   3. `content_url` in the manifest is just the page URL itself
      (`https://antigravity.google/docs/<slug>`) — it is now directly
      fetchable (WebFetch renders the SSR HTML fine), so `antigravity-docs`
@@ -31,6 +36,7 @@ Usage:
 import argparse
 import gzip
 import hashlib
+import html
 import io
 import json
 import os
@@ -58,8 +64,13 @@ BREADCRUMB_RE = re.compile(
 BC_SECTION_RE = re.compile(r'<li class="breadcrumb-section"[^>]*>(.*?)</li>', re.S)
 BC_CURRENT_RE = re.compile(r'<li class="breadcrumb-current"[^>]*>(.*?)</li>', re.S)
 H1_RE = re.compile(r'<h1[^>]*>(.*?)</h1>', re.S)
-DESC_RE = re.compile(
-    r'<div class="caption template-content-paragraph"[^>]*>(.*?)</div>', re.S)
+# The lead paragraph is the first substantial <p> after the body's first <h1>.
+# Two traps this encodes, both hit in the wild:
+#   - `<p[^>]*>` also matches SVG `<path d="...">`; the \b is what keeps it honest.
+#   - the page's nav emits its own <p> elements *before* the doc body, so the
+#     search has to start at the <h1>, not at the top of the document.
+PARA_RE = re.compile(r'<p\b[^>]*>(.*?)</p>', re.S)
+MIN_DESCRIPTION_CHARS = 20
 ANCHOR_RE = re.compile(r'<a[^>]*class="deep-link-anchor".*?</a>', re.S)
 TAG_RE = re.compile(r'<[^>]+>')
 WS_RE = re.compile(r'\s+')
@@ -78,8 +89,11 @@ def fetch(url: str) -> str:
 
 def clean(html_fragment: str) -> str:
     text = ANCHOR_RE.sub("", html_fragment)
-    text = TAG_RE.sub("", text)
-    return WS_RE.sub(" ", text).strip()
+    # Substitute a space, not "": dropping tags outright welds the text on
+    # either side together ("Antigravity 2.0Antigravity CLI" on /docs/enterprise).
+    # The following whitespace collapse puts it back to single spaces.
+    text = TAG_RE.sub(" ", text)
+    return WS_RE.sub(" ", html.unescape(text)).strip()
 
 
 DESCRIPTION_CAP = 280
@@ -153,10 +167,52 @@ def scrape_page(url: str):
     h1_m = H1_RE.search(html)
     title = clean(h1_m.group(1)) if h1_m else None
 
-    desc_m = DESC_RE.search(html)
-    description = truncate_description(clean(desc_m.group(1))) if desc_m else None
+    description = None
+    if h1_m:
+        for para_m in PARA_RE.finditer(html, h1_m.end()):
+            text = clean(para_m.group(1))
+            if len(text) >= MIN_DESCRIPTION_CHARS:
+                description = truncate_description(text)
+                break
 
     return section_path, title, description
+
+
+FIELD_SELECTORS = {
+    "section": "BREADCRUMB_RE / BC_SECTION_RE / BC_CURRENT_RE",
+    "title": "H1_RE",
+    "description": "PARA_RE (first substantial <p> after the first <h1>)",
+}
+# Above this share of pages, a fallback is a stale selector rather than a
+# per-page quirk. Widespread fallback is the failure mode worth shouting about:
+# the manifest still builds, so nothing else in the run looks wrong.
+STALE_SELECTOR_THRESHOLD = 0.5
+
+
+def report_fallbacks(fell_back, total, fetch_failure_count):
+    """Print what the scrape did not find. Loudly, when a whole field is gone."""
+    if not total:
+        return
+    print("\nScrape coverage:")
+    for field, slugs in fell_back.items():
+        got = total - len(slugs)
+        print(f"  {field:12} {got}/{total} scraped"
+              + (f"  ({len(slugs)} fell back to llms.txt)" if slugs else ""))
+
+    for field, slugs in fell_back.items():
+        # Pages that never loaded fall back on every field; that is already
+        # reported above as a fetch failure, so don't blame the selector twice.
+        if len(slugs) - fetch_failure_count <= 0:
+            continue
+        if len(slugs) / total < STALE_SELECTOR_THRESHOLD:
+            continue
+        print(f"\n  {'!' * 72}")
+        print(f"  WARNING: '{field}' fell back on {len(slugs)}/{total} pages that fetched fine.")
+        print(f"  That is a stale selector, not a per-page quirk. The manifest was still")
+        print(f"  written, but its '{field}' column now carries llms.txt boilerplate.")
+        print(f"  Check {FIELD_SELECTORS[field]} against the current page HTML before")
+        print(f"  treating this build as good. Examples: {', '.join(slugs[:3])}")
+        print(f"  {'!' * 72}")
 
 
 def load_existing():
@@ -199,6 +255,12 @@ def main():
 
     pages = []
     scrape_failures = []
+    # Track per-field fallbacks separately from fetch failures. A selector that
+    # stops matching degrades every page at once while every fetch still
+    # succeeds, so counting only exceptions reports a clean build on a manifest
+    # that has quietly lost a field -- which is exactly how the description
+    # scrape stayed broken from 2026-07-25 to 2026-07-30.
+    fell_back = {"section": [], "title": [], "description": []}
     for i, e in enumerate(entries, 1):
         url = f"{BASE}/docs/{e['slug']}"
         section_path = title = description = None
@@ -206,6 +268,10 @@ def main():
             section_path, title, description = scrape_page(url)
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as ex:
             scrape_failures.append((e["slug"], str(ex)))
+        for field, scraped in (("section", section_path), ("title", title),
+                                ("description", description)):
+            if not scraped:
+                fell_back[field].append(e["slug"])
         pages.append({
             "section": section_path or e["section"],
             "slug": e["slug"],
@@ -221,6 +287,8 @@ def main():
               f"to llms.txt title/section/description:")
         for slug, err in scrape_failures:
             print(f"    - {slug}: {err}")
+
+    report_fallbacks(fell_back, len(entries), len(scrape_failures))
 
     manifest = {
         "_meta": {

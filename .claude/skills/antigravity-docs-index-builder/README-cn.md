@@ -14,7 +14,7 @@ Claude Code 和 Codex 的文档页都有一个原始 `.md` 孪生页,直接抓�
 2. **直接抓每一个页面**,从服务端渲染好的 HTML 里正则出三样东西:
    - 面包屑导航(`docs-main-content` 里的 nav)——比 `llms.txt` 那个扁平的 section 更细,比如 `Antigravity 2.0 / Customizations / Skills`
    - `<h1>` 标题
-   - 正文第一段(`template-content-paragraph`)当描述,截到 280 字符
+   - 正文第一段当描述,也就是第一个 `<h1>` 之后第一个够长(≥ 20 字符)的 `<p>`,截到 280 字符
 3. `content_url` 直接记**页面本身的 URL**(`https://antigravity.google/docs/<slug>`)——因为现在这个地址本身就能直接抓到正文了(WebFetch 能正常把这页 SSR 出来的 HTML 转成 markdown),`antigravity-docs` 不再需要单独一个 asset 地址。
 
 ---
@@ -35,7 +35,7 @@ Claude Code 和 Codex 的文档页都有一个原始 `.md` 孪生页,直接抓�
 
 ## 3. 一个关键陷阱:抓 HTML 结构时不能用 WebFetch
 
-这版构建器要精确匹配 HTML 里的 class 名(`breadcrumb-list`、`template-content-paragraph`)才能正则出面包屑和描述,所以必须走**原始字节抓取**(`curl` / Python `urllib`),不能走 WebFetch 这类"把 HTML 转成 markdown"的抓取器——转换过程会把这些 class 属性和精确的 DOM 结构都抹掉,正则就没法定位了。这就是为什么这个 Skill 的 `allowed-tools` 是 `Bash` 而不是 `WebFetch`。
+这版构建器要精确匹配 HTML 的原始结构(`breadcrumb-list` 这个 class、`<h1>`、以及它后面的 `<p>`)才能正则出面包屑和描述,所以必须走**原始字节抓取**(`curl` / Python `urllib`),不能走 WebFetch 这类"把 HTML 转成 markdown"的抓取器——转换过程会把这些 class 属性和精确的 DOM 结构都抹掉,正则就没法定位了。这就是为什么这个 Skill 的 `allowed-tools` 是 `Bash` 而不是 `WebFetch`。
 
 `antigravity-docs` 自己倒是反过来:它现在直接用 WebFetch 抓 `content_url`(也就是文档页本身),因为它只要转换后的可读正文,不需要精确 DOM。
 
@@ -68,7 +68,11 @@ flowchart TD
 
 - **找不到 `## Documentation` 段落 / 一条页面都没解析出来**:说明 `llms.txt` 的格式变了。`curl -s https://antigravity.google/llms.txt` 看一眼新格式,改 `parse_llms_doc_pages` 的正则。
 
-单个页面抓取失败**不是**致命错误——脚本会记下来、那一页退化用 `llms.txt` 的字段兜底,继续跑完。但如果**大部分或全部**页面都抓不到面包屑/描述(不只是零星几个超时),说明官网的 HTML 结构变了:`curl -s --compressed <某个 /docs/slug 地址> -o page.html`,照着 `docs-main-content` 附近新的 class 名,把 `BREADCRUMB_RE` / `H1_RE` / `DESC_RE` 重新对一遍。
+单个页面抓取失败**不是**致命错误——脚本会记下来、那一页退化用 `llms.txt` 的字段兜底,继续跑完。但如果**大部分或全部**页面都抓不到面包屑/描述(不只是零星几个超时),说明官网的 HTML 结构变了:`curl -s --compressed <某个 /docs/slug 地址> -o page.html`,照着 `docs-main-content` 附近现在的结构,把 `BREADCRUMB_RE` / `H1_RE` / `PARA_RE` 重新对一遍。注意 `--compressed` 不是可选的:这台服务器就算你叫它别压也照压,裸 `curl` 拿到的是 gzip 字节,看起来像一堆乱码。
+
+从 0.2.2 起你不用自己去发现这件事:每次跑完都会打印一个 **Scrape coverage** 区块,逐字段报 `n/total scraped`;某个字段在「能正常抓取的页面」里退化超过一半时,会额外打印一个框起来的警告,直接点名该去检查哪条正则。**带着这个警告的构建不算成功**,别把它当成正常结果往下传。
+
+这一条是有来历的:0.2.1 里描述那条正则找的 class 已经不存在了,81 页全部退化成 `Learn about X.`,而当时的脚本只统计网络异常,所以整个构建从头到尾报告成功,这个问题在 2026-07-25 到 07-30 之间一直没被发现。Scrape coverage 就是为了让它不可能再无声发生。
 
 改完重跑,并在这个 Skill 的 `CHANGELOG.md` 里记一笔。
 
